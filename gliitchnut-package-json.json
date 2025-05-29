@@ -1,0 +1,86 @@
+{
+  "name": "glitchnut",
+  "version": "1.0.0",
+  "description": "Glitchnut - A legitimate cryptocurrency blockchain implementation",
+  "main": "glitchnut-core.js",
+  "bin": {
+    "glitchnut": "./glitchnut-cli.js"
+  },
+  "scripts": {
+    "start": "node glitchnut-cli.js start",
+    "api": "node glitchnut-cli.js api",
+    "mine": "node glitchnut-cli.js mine",
+    "init": "node glitchnut-cli.js init",
+    "test": "jest",
+    "dev": "nodemon glitchnut-cli.js start",
+    "build": "npm install",
+    "lint": "eslint *.js",
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "blockchain",
+    "bitcoin",
+    "mining",
+    "proof-of-work",
+    "digital-currency",
+    "glitchnut",
+    "decentralized"
+  ],
+  "author": "Glitchnut Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/glitchnut.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/glitchnut/issues"
+  },
+  "homepage": "https://github.com/yourusername/glitchnut#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "ws": "^8.14.2",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "eslint": "^8.52.0",
+    "jsdoc": "^4.0.2",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"]
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2021": true,
+      "jest": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "off",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    }
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/yourusername"
+  }
+}

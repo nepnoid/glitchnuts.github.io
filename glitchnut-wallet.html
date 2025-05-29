@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitchnut Wallet</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --white: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --success: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .wallet-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .wallet-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .wallet-header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .wallet-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .wallet-nav {
+            display: flex;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab.active {
+            background: var(--white);
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-tab:hover {
+            background: var(--white);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .wallet-balance {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            margin-bottom: 30px;
+            border-radius: 15px;
+        }
+
+        .balance-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .balance-currency {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .wallet-address-display {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .wallet-address-display label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .address-text {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            background: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--text-secondary), #4b5563);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent), var(--success));
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            width: auto;
+            margin-top: 0;
+        }
+
+        .transaction-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .transaction-item.outgoing {
+            border-left-color: var(--danger);
+        }
+
+        .transaction-item.mining {
+            border-left-color: var(--warning);
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .transaction-amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .transaction-amount.positive {
+            color: var(--accent);
+        }
+
+        .transaction-amount.negative {
+            color: var(--danger);
+        }
+
+        .transaction-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .transaction-hash {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            padding: 8px;
+            background: var(--white);
+            border-radius: 6px;
+            word-break: break-all;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left-color: var(--success);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left-color: var(--danger);
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left-color: var(--warning);
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left-color: var(--primary);
+        }
+
+        .seed-phrase {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px dashed var(--border);
+            margin: 20px 0;
+        }
+
+        .seed-words {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .seed-word {
+            background: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.offline {
+            background: var(--danger);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 15px;
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary);
+            background: var(--light);
+        }
+
+        @media (max-width: 768px) {
+            .wallet-nav {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                border-bottom: 1px solid var(--border);
+                border-right: none;
+            }
+            
+            .nav-tab.active {
+                border-bottom-color: var(--border);
+                border-left: 3px solid var(--primary);
+            }
+            
+            .balance-amount {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="wallet-header">
+            <h1>💰 Glitchnut Wallet</h1>
+            <div class="subtitle">Secure. Fast. Decentralized.</div>
+        </div>
+
+        <div class="wallet-container">
+            <div class="wallet-nav">
+                <div class="nav-tab active" data-tab="overview">Overview</div>
+                <div class="nav-tab" data-tab="send">Send</div>
+                <div class="nav-tab" data-tab="receive">Receive</div>
+                <div class="nav-tab" data-tab="history">History</div>
+                <div class="nav-tab" data-tab="settings">Settings</div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview-tab">
+                <div class="connection-status">
+                    <div class="status-dot" id="connection-dot"></div>
+                    <span id="connection-text">Connecting to Glitchnut network...</span>
+                </div>
+
+                <div class="wallet-balance">
+                    <div class="balance-amount" id="wallet-balance">0.00</div>
+                    <div class="balance-currency">GNC</div>
+                </div>
+
+                <div class="wallet-address-display">
+                    <label>Your Wallet Address</label>
+                    <div class="address-text" id="wallet-address">
+                        <span id="address-text">No wallet loaded</span>
+                        <button class="copy-btn" onclick="copyAddress()">Copy</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <button class="btn btn-success" onclick="showTab('send')">Send GNC</button>
+                    <button class="btn" onclick="showTab('receive')">Receive GNC</button>
+                </div>
+            </div>
+
+            <!-- Send Tab -->
+            <div class="tab-content" id="send-tab">
+                <h2 style="margin-bottom: 25px;">💸 Send Glitchnut</h2>
+                
+                <div id="send-alert"></div>
+
+                <div class="form-group">
+                    <label for="send-address">Recipient Address</label>
+                    <input type="text" id="send-address" placeholder="GNC1234567890ABCDEF...">
+                </div>
+
+                <div class="form-group">
+                    <label for="send-amount">Amount (GNC)</label>
+                    <input type="number" id="send-amount" placeholder="0.00" min="0" step="0.01">
+                    <small style="color: var(--text-secondary);">Available: <span id="available-balance">0.00</span> GNC</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="send-fee">Transaction Fee (GNC)</label>
+                    <input type="number" id="send-fee" value="0.1" min="0" step="0.01">
+                    <small style="color: var(--text-secondary);">Higher fees get priority in mining</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="send-note">Note (Optional)</label>
+                    <input type="text" id="send-note" placeholder="Payment for...">
+                </div>
+
+                <button class="btn" id="send-btn" onclick="sendTransaction()">Send Transaction</button>
+            </div>
+
+            <!-- Receive Tab -->
+            <div class="tab-content" id="receive-tab">
+                <h2 style="margin-bottom: 25px;">📥 Receive Glitchnut</h2>
+
+                <div class="wallet-address-display">
+                    <label>Share this address to receive GNC</label>
+                    <div class="address-text">
+                        <span id="receive-address">No wallet loaded</span>
+                        <button class="copy-btn" onclick="copyAddress()">Copy</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <div id="qr-code" style="margin: 20px auto; width: 200px; height: 200px; background: var(--light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                        📱
+                    </div>
+                    <p style="color: var(--text-secondary);">QR Code for easy sharing</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <button class="btn btn-secondary" onclick="shareAddress()">Share Address</button>
+                    <button class="btn" onclick="generateNewAddress()">New Address</button>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="history-tab">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2>📋 Transaction History</h2>
+                    <button class="btn btn-small" onclick="refreshHistory()">Refresh</button>
+                </div>
+
+                <div class="transaction-history" id="transaction-list">
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">📄</div>
+                        <p>No transactions yet</p>
+                        <p>Your transaction history will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content" id="settings-tab">
+                <h2 style="margin-bottom: 25px;">⚙️ Wallet Settings</h2>
+
+                <div class="form-group">
+                    <label>Wallet Management</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-success" onclick="createNewWallet()">Create New Wallet</button>
+                        <button class="btn btn-secondary" onclick="exportWallet()">Export Wallet</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Import Wallet</label>
+                    <div class="file-upload">
+                        <input type="file" id="wallet-file" accept=".json" onchange="importWallet(event)">
+                        <label for="wallet-file" class="file-upload-label">
+                            📁 Choose wallet file (.json)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="node-url">Node URL</label>
+                    <input type="text" id="node-url" value="http://localhost:3000" placeholder="http://localhost:3000">
+                    <small style="color: var(--text-secondary);">Connect to a different Glitchnut node</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Network</label>
+                    <select id="network-select">
+                        <option value="mainnet">Mainnet</option>
+                        <option value="testnet" selected>Testnet</option>
+                        <option value="local">Local Development</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="saveSettings()">Save Settings</button>
+
+                <div class="alert alert-warning" style="margin-top: 30px;">
+                    <strong>⚠️ Security Reminder:</strong> Never share your private keys or wallet files with anyone. Always keep backups in a secure location.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wallet state
+        let currentWallet = null;
+        let balance = 0;
+        let transactions = [];
+        let nodeUrl = 'http://localhost:3000';
+        let isConnected = false;
+
+        // Initialize wallet application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWallet();
+            setupEventListeners();
+            checkConnection();
+        });
+
+        function initializeWallet() {
+            // Load saved wallet from localStorage
+            const savedWallet = localStorage.getItem('glitchnut-wallet');
+            if (savedWallet) {
+                try {
+                    currentWallet = JSON.parse(savedWallet);
+                    updateWalletDisplay();
+                    loadBalance();
+                    loadTransactionHistory();
+                } catch (error) {
+                    console.error('Error loading saved wallet:', error);
+                    showAlert('Error loading saved wallet', 'error');
+                }
+            }
+
+            // Load saved settings
+            const savedNodeUrl = localStorage.getItem('glitchnut-node-url');
+            if (savedNodeUrl) {
+                nodeUrl = savedNodeUrl;
+                document.getElementById('node-url').value = nodeUrl;
+            }
+        }
+
+        function setupEventListeners() {
+            // Tab navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    showTab(tabName);
+                });
+            });
+        }
+
+        function showTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to selected tab and content
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Refresh data if needed
+            if (tabName === 'history') {
+                loadTransactionHistory();
+            }
+        }
+
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${nodeUrl}/api/blockchain/stats`);
+                if (response.ok) {
+                    isConnected = true;
+                    updateConnectionStatus(true);
+                } else {
+                    throw new Error('Connection failed');
+                }
+            } catch (error) {
+                isConnected = false;
+                updateConnectionStatus(false);
+                console.error('Connection error:', error);
+            }
+
+            // Check connection every 30 seconds
+            setTimeout(checkConnection, 30000);
+        }
+
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-text');
+            
+            if (connected) {
+                dot.classList.remove('offline');
+                text.textContent = 'Connected to Glitchnut network';
+            } else {
+                dot.classList.add('offline');
+                text.textContent = 'Disconnected - Check node connection';
+            }
+        }
+
+        async function createNewWallet() {
+            try {
+                // Generate new wallet address (simplified for demo)
+                const newWallet = {
+                    address: 'GNC' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+                    privateKey: 'PRIVATE_' + Math.random().toString(36).substring(2, 32),
+                    createdAt: new Date().toISOString()
+                };
+
+                currentWallet = newWallet;
+                
+                // Save to localStorage
+                localStorage.setItem('glitchnut-wallet', JSON.stringify(currentWallet));
+                
+                updateWalletDisplay();
+                loadBalance();
+                
+                showAlert('New wallet created successfully!', 'success');
+                showTab('overview');
+            } catch (error) {
+                console.error('Error creating wallet:', error);
+                showAlert('Failed to create new wallet', 'error');
+            }
+        }
+
+        function updateWalletDisplay() {
+            if (currentWallet) {
+                document.getElementById('wallet-address').querySelector('#address-text').textContent = currentWallet.address;
+                document.getElementById('receive-address').textContent = currentWallet.address;
+                document.getElementById('available-balance').textContent = balance.toFixed(2);
+            }
+        }
+
+        async function loadBalance() {
+            if (!currentWallet || !isConnected) return;
+
+            try {
+                const response = await fetch(`${nodeUrl}/api/wallets/${currentWallet.address}/balance`);
+                if (response.ok) {
+                    const data = await response.json();
+                    balance = data.balance || 0;
+                    document.getElementById('wallet-balance').textContent = balance.toFixed(2);
+                    document.getElementById('available-balance').textContent = balance.toFixed(2);
+                }
+            } catch (error) {
+                console.error('Error loading balance:', error);
+            }
+        }
+
+        async function loadTransactionHistory() {
+            if (!currentWallet || !isConnected) return;
+
+            try {
+                const response = await fetch(`${nodeUrl}/api/wallets/${currentWallet.address}/transactions`);
+                if (response.ok) {
+                    const data = await response.json();
+                    transactions = data.transactions || [];
+                    displayTransactionHistory();
+                }
+            } catch (error) {
+                console.error('Error loading transaction history:', error);
+            }
+        }
+
+        function displayTransactionHistory() {
+            const container = document.getElementById('transaction-list');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">📄</div>
+                        <p>No transactions yet</p>
+                        <p>Your transaction history will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            transactions.forEach(tx => {
+                const isIncoming = tx.toAddress === currentWallet.address;
+                const isMining = tx.fromAddress === null;
+                const amount = isIncoming ? tx.amount : -tx.amount;
+                
+                const txElement = document.createElement('div');
+                txElement.className = `transaction-item ${isIncoming ? 'incoming' : 'outgoing'} ${isMining ? 'mining' : ''}`;
+                
+                txElement.innerHTML = `
+                    <div class="transaction-header">
+                        <div>
+                            <strong>${isMining ? '⛏️ Mining Reward' : (isIncoming ? '📥 Received' : '📤 Sent')}</strong>
+                            <div class="transaction-details">
+                                ${new Date(tx.timestamp).toLocaleString()}
+                                ${tx.confirmations ? `• ${tx.confirmations} confirmations` : '• Pending'}
+                            </div>
+                        </div>
+                        <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
+                            ${amount > 0 ? '+' : ''}${amount.toFixed(4)} GNC
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <strong>${isIncoming ? 'From:' : 'To:'}</strong> ${isIncoming ? (tx.fromAddress || 'Mining Reward') : tx.toAddress}
+                        ${tx.fee ? `<br><strong>Fee:</strong> ${tx.fee} GNC` : ''}
+                    </div>
+                    <div class="transaction-hash">
+                        <strong>Hash:</strong> ${tx.hash}
+                    </div>
+                `;
+                
+                container.appendChild(txElement);
+            });
+        }
+
+        async function sendTransaction() {
+            if (!currentWallet) {
+                showAlert('No wallet loaded', 'error', 'send');
+                return;
+            }
+
+            const recipientAddress = document.getElementById('send-address').value;
+            const amount = parseFloat(document.getElementById('send-amount').value);
+            const fee = parseFloat(document.getElementById('send-fee').value) || 0;
+            const note = document.getElementById('send-note').value;
+
+            // Validation
+            if (!recipientAddress) {
+                showAlert('Please enter recipient address', 'error', 'send');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                showAlert('Please enter a valid amount', 'error', 'send');
+                return;
+            }
+
+            if (amount + fee > balance) {
+                showAlert('Insufficient balance', 'error', 'send');
+                return;
+            }
+
+            if (!isConnected) {
+                showAlert('Not connected to network', 'error', 'send');
+                return;
+            }
+
+            try {
+                document.getElementById('send-btn').disabled = true;
+                showAlert('Sending transaction...', 'info', 'send');
+
+                const response = await fetch(`${nodeUrl}/api/transactions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fromAddress: currentWallet.address,
+                        toAddress: recipientAddress,
+                        amount: amount,
+                        fee: fee,
+                        note: note
+                    })
+                });
+
+                if (response.ok) {
+                    showAlert('Transaction sent successfully!', 'success', 'send');
+                    
+                    // Clear form
+                    document.getElementById('send-address').value = '';
+                    document.getElementById('send-amount').value = '';
+                    document.getElementById('send-note').value = '';
+                    
+                    // Refresh balance and history
+                    setTimeout(() => {
+                        loadBalance();
+                        loadTransactionHistory();
+                    }, 1000);
+                } else {
+                    throw new Error('Transaction failed');
+                }
+            } catch (error) {
+                console.error('Send transaction error:', error);
+                showAlert('Transaction failed: ' + error.message, 'error', 'send');
+            } finally {
+                document.getElementById('send-btn').disabled = false;
+            }
+        }
+
+        function copyAddress() {
+            if (!currentWallet) return;
+            
+            navigator.clipboard.writeText(currentWallet.address).then(() => {
+                showAlert('Address copied to clipboard!', 'success');
+            }).catch(() => {
+                showAlert('Failed to copy address', 'error');
+            });
+        }
+
+        function shareAddress() {
+            if (!currentWallet) return;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Glitchnut Address',
+                    text: 'Send Glitchnut to this address:',
+                    url: currentWallet.address
+                });
+            } else {
+                copyAddress();
+            }
+        }
+
+        function generateNewAddress() {
+            if (confirm('Generate a new receiving address? Your current address will still work.')) {
+                // In a real wallet, this would generate a new address from the same seed
+                showAlert('New address generated', 'success');
+            }
+        }
+
+        function exportWallet() {
+            if (!currentWallet) {
+                showAlert('No wallet to export', 'error');
+                return;
+            }
+
+            const walletData = {
+                ...currentWallet,
+                exportDate: new Date().toISOString(),
+                balance: balance
+            };
+
+            const blob = new Blob([JSON.stringify(walletData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `glitchnut-wallet-${currentWallet.address.substring(0, 8)}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showAlert('Wallet exported successfully', 'success');
+        }
+
+        function importWallet(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const walletData = JSON.parse(e.target.result);
+                    
+                    if (!walletData.address || !walletData.privateKey) {
+                        throw new Error('Invalid wallet file format');
+                    }
+
+                    currentWallet = walletData;
+                    localStorage.setItem('glitchnut-wallet', JSON.stringify(currentWallet));
+                    
+                    updateWalletDisplay();
+                    loadBalance();
+                    loadTransactionHistory();
+                    
+                    showAlert('Wallet imported successfully!', 'success');
+                    showTab('overview');
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showAlert('Failed to import wallet: ' + error.message, 'error');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function saveSettings() {
+            const newNodeUrl = document.getElementById('node-url').value;
+            const network = document.getElementById('network-select').value;
+            
+            nodeUrl = newNodeUrl;
+            localStorage.setItem('glitchnut-node-url', nodeUrl);
+            localStorage.setItem('glitchnut-network', network);
+            
+            showAlert('Settings saved successfully', 'success');
+            
+            // Reconnect to new node
+            checkConnection();
+        }
+
+        function refreshHistory() {
+            loadTransactionHistory();
+            showAlert('Transaction history refreshed', 'info');
+        }
+
+        function showAlert(message, type, tab = null) {
+            const alertHtml = `<div class="alert alert-${type}">${message}</div>`;
+            
+            if (tab) {
+                const alertContainer = document.querySelector(`#${tab}-alert`);
+                if (alertContainer) {
+                    alertContainer.innerHTML = alertHtml;
+                    setTimeout(() => alertContainer.innerHTML = '', 5000);
+                }
+            } else {
+                // Show global alert
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                const alertElement = document.createElement('div');
+                alertElement.innerHTML = alertHtml;
+                document.body.appendChild(alertElement.firstChild);
+                
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert');
+                    if (alert) alert.remove();
+                }, 5000);
+            }
+        }
+
+        // Auto-refresh data every 30 seconds
+        setInterval(() => {
+            if (currentWallet && isConnected) {
+                loadBalance();
+                if (document.querySelector('[data-tab="history"]').classList.contains('active')) {
+                    loadTransactionHistory();
+                }
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
