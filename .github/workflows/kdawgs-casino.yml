@@ -1,0 +1,319 @@
+/* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .sidebar {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                display: grid;
+                gap: 1rem;
+            }
+            
+            .header {
+                padding: 1.5rem 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .games-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .balance-display {
+                font-size: 1.3rem;
+            }
+            
+            .keno-board {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 4px;
+                max-width: 100%;
+            }
+            
+            .keno-number {
+                min-height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .game-card {
+                padding: 1rem;
+            }
+            
+            .game-icon {
+                font-size: 2.5rem;
+            }
+            
+            .game-title {
+                font-size: 1.3rem;
+            }
+            
+            .game-description {
+                font-size: 0.9rem;
+            }
+            
+            .play-button {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.8rem;
+                margin: 0.3rem 0.2rem;
+                min-height: 44px; /* Touch-friendly */
+            }
+            
+            .bet-input {
+                padding: 0.7rem;
+                font-size: 1rem;
+                min-height: 44px; /* Touch-friendly */
+                width: 100px;
+            }
+            
+            .blackjack-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            
+            .blackjack-controls button {
+                width: 80%;
+                max-width: 200px;
+            }
+            
+            .roulette-wheel {
+                width: 150px;
+                height: 150px;
+                font-size: 1.2rem;
+            }
+            
+            .roulette-bets {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .bet-option {
+                padding: 12px;
+                font-size: 0.9rem;
+                min-height: 44px; /* Touch-friendly */
+            }
+            
+            .card {
+                width: 50px;
+                height: 70px;
+                font-size: 1rem;
+            }
+            
+            .dealer-cards, .player-cards {
+                gap: 8px;
+            }
+            
+            .poker-hand {
+                gap: 8px;
+                justify-content: space-around;
+            }
+            
+            .hold-button {
+                padding: 8px 12px;
+                font-size: 0.7rem;
+                min-height: 36px;
+            }
+            
+            .scratch-card {
+                width: 280px;
+                height: 180px;
+                margin: 15px auto;
+            }
+            
+            .sidebar-panel {
+                padding: 1rem;
+            }
+            
+            .panel-title {
+                font-size: 1.1rem;
+            }
+            
+            .leaderboard-entry {
+                font-size: 0.8rem;
+                padding: 0.6rem;
+            }
+            
+            .chat-messages {
+                height: 150px;
+                font-size: 0.75rem;
+            }
+            
+            .chat-input input, .chat-input button {
+                padding: 0.6rem;
+                font-size: 0.8rem;
+                min-height: 44px; /* Touch-friendly */
+            }
+            
+            .vote-option {
+                padding: 0.7rem;
+                font-size: 0.8rem;
+                min-height: 44px; /* Touch-friendly */
+            }
+            
+            .wallet-btn {
+                padding: 0.8rem 1rem;
+                font-size: 0.8rem;
+                min-height: 44px; /* Touch-friendly */
+            }
+            
+            .crypto-balance {
+                padding: 0.6rem;
+            }
+            
+            .crypto-name {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0.5rem;
+            }
+            
+            .header {
+                padding: 1rem 0.5rem;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .balance-display {
+                font-size: 1.1rem;
+            }
+            
+            .keno-board {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 3px;
+            }
+            
+            .keno-number {
+                min-height: 32px;
+                font-size: 0.8rem;
+            }
+            
+            .game-card {
+                padding: 0.8rem;
+            }
+            
+            .game-icon {
+                font-size: 2rem;
+            }
+            
+            .game-title {
+                font-size: 1.2rem;
+            }
+            
+            .roulette-wheel {
+                width: 120px;
+                height: 120px;
+                font-size: 1rem;
+            }
+            
+            .roulette-bets {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                width: 45px;
+                height: 60px;
+                font-size: 0.9rem;
+            }
+            
+            .scratch-card {
+                width: 260px;
+                height: 160px;
+            }
+            
+            .sidebar {
+                grid-template-columns: 1fr;
+            }
+            
+            .featured-game {
+                grid-column: 1;
+            }
+            
+            .poker-hand > div {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .blackjack-table {
+                padding: 15px;
+            }
+            
+            .keno-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            
+            .keno-controls input {
+                width: 120px;
+            }
+        }
+        
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .keno-number:hover {
+                background: rgba(0,255,65,0.1);
+                transform: none;
+            }
+            
+            .keno-number:active {
+                background: rgba(0,255,65,0.3);
+                transform: scale(0.95);
+            }
+            
+            .play-button:hover {
+                transform: none;
+            }
+            
+            .play-button:active {
+                transform: scale(0.95);
+            }
+            
+            .bet-option:hover {
+                background: rgba(0,255,65,0.1);
+                transform: none;
+            }
+            
+            .bet-option:active {
+                background: rgba(0,255,65,0.3);
+                transform: scale(0.95);
+            }
+            
+            .vote-option:hover {
+                background: rgba(0,255,65,0.1);
+            }
+            
+            .vote-option:active {
+                background: rgba(0,255,65,0.3);
+                transform: scale(0.95);
+            }
+            
+            .wallet-btn:hover {
+                transform: none;
+            }
+            
+            .wallet-btn:active {
+                transform: scale(0.95);
+            }
+        }
