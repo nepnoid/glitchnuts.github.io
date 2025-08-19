@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlitchNuts - Revolutionary Crypto Platform</title>
+    <title>Game Network Coin (GNC) - Gaming Meets Crypto</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             color: white;
             overflow-x: hidden;
         }
@@ -44,8 +44,11 @@
         .logo {
             font-size: 24px;
             font-weight: bold;
-            color: #00ff88;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            color: #00ff41;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .nav-links {
@@ -63,7 +66,7 @@
         }
 
         .nav-links a:hover {
-            background: rgba(0, 255, 136, 0.2);
+            background: rgba(0, 255, 65, 0.2);
             transform: translateY(-2px);
         }
 
@@ -75,6 +78,7 @@
             justify-content: center;
             text-align: center;
             position: relative;
+            background: radial-gradient(circle at center, rgba(0, 255, 65, 0.1) 0%, transparent 70%);
         }
 
         .hero-content {
@@ -84,53 +88,103 @@
 
         .hero h1 {
             font-size: 4rem;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00ff41, #00d4ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 50px rgba(0, 255, 65, 0.3);
+        }
+
+        .hero .subtitle {
+            font-size: 1.8rem;
+            color: #00ff41;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
 
         .hero p {
             font-size: 1.5rem;
             margin-bottom: 40px;
             opacity: 0.9;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .cta-button {
             display: inline-block;
             padding: 15px 40px;
-            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            background: linear-gradient(45deg, #00ff41, #00d4ff);
             color: black;
             text-decoration: none;
             border-radius: 50px;
             font-weight: bold;
             font-size: 1.2rem;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
         }
 
         .cta-button:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 255, 65, 0.5);
         }
 
-        /* Floating Elements */
-        .floating-element {
-            position: absolute;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite;
+        .cta-button.secondary {
+            background: transparent;
+            color: #00ff41;
+            border: 2px solid #00ff41;
         }
 
-        .floating-element:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .floating-element:nth-child(2) { top: 60%; right: 10%; animation-delay: 2s; }
-        .floating-element:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 4s; }
+        .cta-button.secondary:hover {
+            background: #00ff41;
+            color: black;
+        }
+
+        /* Token Info */
+        .token-info {
+            padding: 80px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .token-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            text-align: center;
+        }
+
+        .token-value {
+            font-size: 2rem;
+            color: #00ff41;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .token-label {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
 
         /* Features Section */
         .features {
             padding: 100px 0;
-            background: rgba(0, 0, 0, 0.2);
         }
 
         .features-grid {
@@ -145,55 +199,93 @@
             padding: 40px;
             border-radius: 20px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 65, 0.2);
             text-align: center;
             transition: all 0.3s ease;
         }
 
         .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 255, 65, 0.2);
+            border-color: #00ff41;
         }
 
         .feature-icon {
             font-size: 3rem;
             margin-bottom: 20px;
-            color: #00ff88;
+            color: #00ff41;
         }
 
         .feature-card h3 {
             font-size: 1.5rem;
             margin-bottom: 15px;
-            color: #00ff88;
+            color: #00ff41;
         }
 
-        /* Stats Section */
-        .stats {
-            padding: 80px 0;
-            text-align: center;
+        /* Gaming Ecosystem */
+        .ecosystem {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        .stats-grid {
+        .ecosystem-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
         }
 
-        .stat-item {
+        .ecosystem-card {
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 212, 255, 0.1));
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .ecosystem-card:hover {
+            transform: scale(1.05);
+            border-color: #00ff41;
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        }
+
+        /* Roadmap */
+        .roadmap {
+            padding: 100px 0;
+        }
+
+        .roadmap-timeline {
+            margin-top: 60px;
+            position: relative;
+        }
+
+        .roadmap-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            animation: slideInLeft 0.6s ease forwards;
+        }
+
+        .roadmap-item:nth-child(even) {
+            flex-direction: row-reverse;
+            animation: slideInRight 0.6s ease forwards;
+        }
+
+        .roadmap-content {
+            flex: 1;
             padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin: 0 20px;
+            border-left: 4px solid #00ff41;
         }
 
-        .stat-number {
-            font-size: 3rem;
+        .roadmap-quarter {
+            color: #00ff41;
             font-weight: bold;
-            color: #00ff88;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
             font-size: 1.2rem;
-            opacity: 0.8;
+            margin-bottom: 10px;
         }
 
         /* Contact Section */
@@ -203,56 +295,55 @@
             text-align: center;
         }
 
-        .contact-form {
-            max-width: 600px;
-            margin: 0 auto;
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
             margin-top: 40px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
+        .contact-item {
+            padding: 30px;
             background: rgba(255, 255, 255, 0.1);
-            color: white;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
         }
 
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+        .contact-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: #00ff41;
+            margin-bottom: 15px;
         }
 
         /* Footer */
         footer {
             padding: 40px 0;
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(0, 255, 65, 0.3);
         }
 
-        .social-links {
+        .footer-links {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 30px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
-        .social-links a {
-            color: #00ff88;
-            font-size: 1.5rem;
+        .footer-links a {
+            color: #00ff41;
+            text-decoration: none;
+            font-size: 1.1rem;
             transition: all 0.3s ease;
         }
 
-        .social-links a:hover {
-            transform: scale(1.2);
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        .footer-links a:hover {
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
         }
 
         /* Animations */
@@ -267,9 +358,35 @@
             }
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(0, 255, 65, 0.5); }
+            50% { text-shadow: 0 0 30px rgba(0, 255, 65, 0.8); }
+        }
+
+        .glow {
+            animation: glow 2s ease-in-out infinite;
         }
 
         /* Responsive */
@@ -286,23 +403,19 @@
                 display: none;
             }
 
-            .features-grid {
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .features-grid,
+            .ecosystem-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        /* Glitch Effect */
-        .glitch {
-            animation: glitch 2s infinite;
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
+            .roadmap-item {
+                flex-direction: column !important;
+            }
         }
     </style>
 </head>
@@ -311,12 +424,14 @@
     <nav>
         <div class="container">
             <div class="nav-content">
-                <div class="logo glitch">GLITCHNUTS</div>
+                <div class="logo glow">🎮 GAME NETWORK COIN</div>
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
+                    <li><a href="#token">Token Info</a></li>
                     <li><a href="#features">Features</a></li>
-                    <li><a href="#stats">Stats</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#ecosystem">Ecosystem</a></li>
+                    <li><a href="#roadmap">Roadmap</a></li>
+                    <li><a href="#contact">Community</a></li>
                 </ul>
             </div>
         </div>
@@ -324,15 +439,45 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="floating-element">💎</div>
-        <div class="floating-element">🚀</div>
-        <div class="floating-element">⚡</div>
-        
         <div class="container">
             <div class="hero-content">
-                <h1 class="glitch">GLITCHNUTS</h1>
-                <p>The Future of Decentralized Finance is Here</p>
-                <a href="#features" class="cta-button">Launch Into Crypto</a>
+                <h1 class="glow">GAME NETWORK BLOCKCHAIN</h1>
+                <div class="subtitle">GNC - Independent Blockchain Network</div>
+                <p>The world's first independent blockchain network built specifically for gaming. Like Bitcoin for payments or XRP for banking - GNC is the blockchain for gaming. Complete with our own servers, nodes, and infrastructure.</p>
+                <div class="cta-buttons">
+                    <a href="#mining" class="cta-button">Start Mining GNC</a>
+                    <a href="#staking" class="cta-button secondary">Stake & Earn</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Token Info -->
+    <section class="token-info" id="mining">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 3rem; margin-bottom: 20px; color: #00ff41;">Mine & Stake GNC</h2>
+            <p style="text-align: center; font-size: 1.2rem; opacity: 0.8;">Earn GNC through mining and staking - no presales, no fundraising</p>
+            
+            <div class="token-grid">
+                <div class="token-card">
+                    <div class="token-value">Mine</div>
+                    <div class="token-label">Earn Through Mining</div>
+                </div>
+                
+                <div class="token-card">
+                    <div class="token-value">Stake</div>
+                    <div class="token-label">Passive Income</div>
+                </div>
+                
+                <div class="token-card">
+                    <div class="token-value">Trade</div>
+                    <div class="token-label">Market-Driven Value</div>
+                </div>
+                
+                <div class="token-card">
+                    <div class="token-value">Utility</div>
+                    <div class="token-label">Real Gaming Use</div>
+                </div>
             </div>
         </div>
     </section>
@@ -340,95 +485,173 @@
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="container">
-            <h2 style="text-align: center; font-size: 3rem; margin-bottom: 20px; color: #00ff88;">Revolutionary Features</h2>
-            <p style="text-align: center; font-size: 1.2rem; opacity: 0.8;">Experience the next generation of crypto trading</p>
+            <h2 style="text-align: center; font-size: 3rem; margin-bottom: 20px; color: #00ff41;">Why Game Network Blockchain?</h2>
+            <p style="text-align: center; font-size: 1.2rem; opacity: 0.8;">True decentralization - mine it, stake it, trade it, use it</p>
             
             <div class="features-grid">
                 <div class="feature-card">
+                    <div class="feature-icon">🏗️</div>
+                    <h3>Independent Network</h3>
+                    <p>Complete blockchain infrastructure with our own servers, nodes, and validation system - not dependent on Ethereum or other networks</p>
+                </div>
+                
+                <div class="feature-card">
                     <div class="feature-icon">⚡</div>
-                    <h3>Lightning Fast</h3>
-                    <p>Execute trades in milliseconds with our advanced trading engine</p>
+                    <h3>Ultra-Fast Processing</h3>
+                    <p>Custom-built consensus mechanism optimized for gaming transactions with sub-second confirmation times</p>
                 </div>
                 
                 <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Ultra Secure</h3>
-                    <p>Military-grade encryption and multi-layer security protocols</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">💎</div>
-                    <h3>Premium Assets</h3>
-                    <p>Access exclusive tokens and early investment opportunities</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>Moon Potential</h3>
-                    <p>Our proprietary algorithm identifies the next 100x gems</p>
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Enterprise Security</h3>
+                    <p>Military-grade security protocols with proprietary encryption and multi-layer validation systems</p>
                 </div>
                 
                 <div class="feature-card">
                     <div class="feature-icon">🌐</div>
-                    <h3>Global Access</h3>
-                    <p>Trade anywhere, anytime with our worldwide infrastructure</p>
+                    <h3>Global Infrastructure</h3>
+                    <p>Distributed server network ensuring 99.99% uptime and low-latency access worldwide</p>
                 </div>
                 
                 <div class="feature-card">
-                    <div class="feature-icon">💰</div>
-                    <h3>Max Profits</h3>
-                    <p>Advanced yield farming and staking opportunities</p>
+                    <div class="feature-icon">🎮</div>
+                    <h3>Gaming Optimized</h3>
+                    <p>Purpose-built for gaming applications with specialized smart contracts for in-game economies</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💎</div>
+                    <h3>Scalable Architecture</h3>
+                    <p>Designed to handle millions of gaming transactions per second without network congestion</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats" id="stats">
+    <!-- Gaming Ecosystem -->
+    <section class="ecosystem" id="ecosystem">
         <div class="container">
-            <h2 style="font-size: 3rem; margin-bottom: 60px; color: #00ff88;">Platform Statistics</h2>
+            <h2 style="text-align: center; font-size: 3rem; margin-bottom: 20px; color: #00ff41;">Gaming Ecosystem</h2>
+            <p style="text-align: center; font-size: 1.2rem; opacity: 0.8;">Building the future of gaming finance</p>
             
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-number">$2.5B+</span>
-                    <span class="stat-label">Total Volume Traded</span>
+            <div class="ecosystem-grid">
+                <div class="ecosystem-card">
+                    <h3>⛏️ Mining Network</h3>
+                    <p>Mine GNC with your gaming rig or dedicated mining hardware. Fair distribution through proof-of-work mining</p>
                 </div>
                 
-                <div class="stat-item">
-                    <span class="stat-number">50K+</span>
-                    <span class="stat-label">Active Traders</span>
+                <div class="ecosystem-card">
+                    <h3>💰 Staking Rewards</h3>
+                    <p>Stake your mined GNC to earn passive income while securing the network. No minimum stake required</p>
                 </div>
                 
-                <div class="stat-item">
-                    <span class="stat-number">99.9%</span>
-                    <span class="stat-label">Uptime Guarantee</span>
+                <div class="ecosystem-card">
+                    <h3>📈 Market Trading</h3>
+                    <p>Trade GNC on decentralized exchanges. Value determined by market demand and gaming utility</p>
                 </div>
                 
-                <div class="stat-item">
-                    <span class="stat-number">24/7</span>
-                    <span class="stat-label">Support Available</span>
+                <div class="ecosystem-card">
+                    <h3>🎮 Gaming Utility</h3>
+                    <p>Use GNC for in-game purchases, tournaments, and rewards. Real utility drives real value</p>
+                </div>
+                
+                <div class="ecosystem-card">
+                    <h3>🌐 Decentralized Network</h3>
+                    <p>Community-owned and operated. No central authority, no presales, no investor tokens</p>
+                </div>
+                
+                <div class="ecosystem-card">
+                    <h3>🔒 Fair Launch</h3>
+                    <p>100% fair distribution. Everyone starts equal. Earn through mining, staking, or gaming</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- Roadmap -->
+    <section class="roadmap" id="roadmap">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 3rem; margin-bottom: 20px; color: #00ff41;">Development Roadmap</h2>
+            <p style="text-align: center; font-size: 1.2rem; opacity: 0.8;">Our journey to revolutionize gaming finance</p>
+            
+            <div class="roadmap-timeline">
+                <div class="roadmap-item">
+                    <div class="roadmap-content">
+                        <div class="roadmap-quarter">Q1 2025</div>
+                        <h3>Network Launch</h3>
+                        <p>• Mining network goes live<br>• Staking protocol activation<br>• Community-driven distribution</p>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item">
+                    <div class="roadmap-content">
+                        <div class="roadmap-quarter">Q2 2025</div>
+                        <h3>Trading & Utility</h3>
+                        <p>• Decentralized exchange listings<br>• First gaming integrations<br>• Mining pool ecosystem</p>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item">
+                    <div class="roadmap-content">
+                        <div class="roadmap-quarter">Q3 2025</div>
+                        <h3>Network Growth</h3>
+                        <p>• Increased mining difficulty<br>• Enhanced staking rewards<br>• Major exchange adoption</p>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item">
+                    <div class="roadmap-content">
+                        <div class="roadmap-quarter">Q4 2025</div>
+                        <h3>Global Network</h3>
+                        <p>• Worldwide mining nodes<br>• Cross-platform gaming<br>• Community governance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact/Community -->
     <section class="contact" id="contact">
         <div class="container">
-            <h2 style="font-size: 3rem; margin-bottom: 20px; color: #00ff88;">Join the Revolution</h2>
-            <p style="font-size: 1.2rem; opacity: 0.8;">Ready to transform your crypto journey?</p>
+            <h2 style="font-size: 3rem; margin-bottom: 20px; color: #00ff41;">Join the Gaming Revolution</h2>
+            <p style="font-size: 1.2rem; opacity: 0.8;">Connect with the GNC community across all platforms</p>
             
-            <div class="contact-form">
-                <div class="form-group">
-                    <input type="email" placeholder="Your Email Address" required>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <div class="contact-icon">💬</div>
+                    <h3>Discord</h3>
+                    <p>Join our gaming community</p>
                 </div>
-                <div class="form-group">
-                    <input type="text" placeholder="Your Name">
+                
+                <div class="contact-item">
+                    <div class="contact-icon">🐦</div>
+                    <h3>Twitter</h3>
+                    <p>Latest updates & news</p>
                 </div>
-                <div class="form-group">
-                    <textarea rows="5" placeholder="Tell us about your crypto goals..."></textarea>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">📱</div>
+                    <h3>Telegram</h3>
+                    <p>Official announcements</p>
                 </div>
-                <a href="#" class="cta-button" onclick="alert('Welcome to GlitchNuts! We\'ll be in touch soon.')">Get Early Access</a>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">📧</div>
+                    <h3>Newsletter</h3>
+                    <p>Weekly gaming insights</p>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">📖</div>
+                    <h3>Medium</h3>
+                    <p>Technical articles & guides</p>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">🎮</div>
+                    <h3>Twitch</h3>
+                    <p>Live gaming streams</p>
+                </div>
             </div>
         </div>
     </section>
@@ -436,18 +659,20 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2025 GlitchNuts. All rights reserved. | The future is decentralized.</p>
-            <div class="social-links">
-                <a href="#">📱</a>
-                <a href="#">💬</a>
-                <a href="#">📧</a>
-                <a href="#">🐦</a>
+            <p>&copy; 2025 Game Network Coin (GNC). All rights reserved. | Powering the future of gaming.</p>
+            <div class="footer-links">
+                <a href="#">Whitepaper</a>
+                <a href="#">Tokenomics</a>
+                <a href="#">Audit Report</a>
+                <a href="#">Developer Docs</a>
+                <a href="#">Legal</a>
+                <a href="#">Privacy Policy</a>
             </div>
         </div>
     </footer>
 
     <script>
-        // Smooth scrolling for navigation links
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -461,46 +686,57 @@
             });
         });
 
-        // Animate stats on scroll
-        const animateStats = () => {
-            const stats = document.querySelectorAll('.stat-number');
-            stats.forEach(stat => {
-                const finalValue = stat.textContent;
-                stat.textContent = '0';
-                
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            stat.textContent = finalValue;
-                            observer.unobserve(entry.target);
-                        }
-                    });
+        // Animate roadmap items on scroll
+        const observeRoadmap = () => {
+            const roadmapItems = document.querySelectorAll('.roadmap-item');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.animationDelay = `${index * 0.2}s`;
+                            entry.target.style.opacity = '1';
+                        }, index * 200);
+                    }
                 });
-                
-                observer.observe(stat);
             });
+
+            roadmapItems.forEach(item => observer.observe(item));
         };
 
         // Initialize animations
-        document.addEventListener('DOMContentLoaded', animateStats);
+        document.addEventListener('DOMContentLoaded', observeRoadmap);
 
-        // Add some interactive effects
+        // Gaming-themed cursor effect
         document.addEventListener('mousemove', (e) => {
-            const cursor = document.createElement('div');
-            cursor.style.position = 'fixed';
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursor.style.width = '10px';
-            cursor.style.height = '10px';
-            cursor.style.borderRadius = '50%';
-            cursor.style.background = 'rgba(0, 255, 136, 0.3)';
-            cursor.style.pointerEvents = 'none';
-            cursor.style.zIndex = '9999';
-            document.body.appendChild(cursor);
+            if (Math.random() > 0.95) { // Only sometimes for performance
+                const pixel = document.createElement('div');
+                pixel.style.position = 'fixed';
+                pixel.style.left = (e.clientX - 2) + 'px';
+                pixel.style.top = (e.clientY - 2) + 'px';
+                pixel.style.width = '4px';
+                pixel.style.height = '4px';
+                pixel.style.background = '#00ff41';
+                pixel.style.pointerEvents = 'none';
+                pixel.style.zIndex = '9999';
+                pixel.style.borderRadius = '50%';
+                pixel.style.boxShadow = '0 0 10px #00ff41';
+                document.body.appendChild(pixel);
+                
+                setTimeout(() => {
+                    pixel.remove();
+                }, 500);
+            }
+        });
+
+        // Add some gaming sound effects (visual feedback)
+        document.querySelectorAll('.cta-button, .feature-card, .ecosystem-card').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                element.style.transform = element.style.transform + ' scale(1.02)';
+            });
             
-            setTimeout(() => {
-                cursor.remove();
-            }, 100);
+            element.addEventListener('mouseleave', () => {
+                element.style.transform = element.style.transform.replace(' scale(1.02)', '');
+            });
         });
     </script>
 </body>
