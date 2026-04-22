@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Glitchnut - Game Network Coin</title>
+    <style>
+        :root {
+            --p: #6366f1;
+            --s: #8b5cf6;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --t: #f8fafc;
+            --m: #94a3b8;
+            --g: #10b981;
+            --r: #ef4444;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: var(--t);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            text-align: center;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--m);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--m);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--p);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        input::placeholder {
+            color: #475569;
+        }
+
+        .wallet-banner {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .wallet-label {
+            font-size: 0.75rem;
+            color: var(--p);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .wallet-address {
+            font-family: 'ui-monospace', monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            color: var(--g);
+        }
+
+        button.btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--p), var(--s));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button.btn:hover {
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+
+        button.btn:active {
+            transform: translateY(0);
+        }
+
+        button.btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.9rem;
+            color: var(--m);
+        }
+
+        .footer-link a {
+            color: var(--p);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .success { background: var(--g); }
+        .error { background: var(--r); }
+    </style>
+</head>
+<body>
+
+    <div class="signup-container">
+        <h1>GNC Genesis</h1>
+        <p class="subtitle">Secure your spot in the network.</p>
+
+        <div id="registration-form">
+            <div class="wallet-banner">
+                <div class="wallet-label">GENERATED WALLET ADDRESS</div>
+                <div class="wallet-address" id="wallet-address-display">Generating...</div>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="glitchnut_king">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="matt@gnc.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Security Password</label>
+                <input type="password" id="password" placeholder="••••••••">
+            </div>
+
+            <div class="form-group">
+                <label for="referral">Referral Code (Optional)</label>
+                <input type="text" id="referral" placeholder="GNC-XXXX-XXXX">
+            </div>
+
+            <button class="btn" id="submit-btn" onclick="register()">Create Account</button>
+
+            <div class="footer-link">
+                Already have an account? <a href="login.html">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
+    <script>
+        let currentWallet = null;
+        const nodeUrl = localStorage.getItem('glitchnut-node-url') || 'http://localhost:3000';
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 5000);
+        }
+
+        function init() {
+            // Check for existing wallet
+            const saved = localStorage.getItem('glitchnut-wallet');
+            if (saved) {
+                try {
+                    currentWallet = JSON.parse(saved);
+                    document.getElementById('wallet-address-display').textContent = currentWallet.address;
+                } catch (e) {
+                    generateWallet();
+                }
+            } else {
+                generateWallet();
+            }
+        }
+
+        function generateWallet() {
+            try {
+                const ec = new elliptic.ec('secp256k1');
+                const kp = ec.genKeyPair();
+                currentWallet = {
+                    address: kp.getPublic('hex'),
+                    walletAddress: kp.getPublic('hex'),
+                    privateKey: kp.getPrivate('hex'),
+                    createdAt: new Date().toISOString()
+                };
+                localStorage.setItem('glitchnut-wallet', JSON.stringify(currentWallet));
+                document.getElementById('wallet-address-display').textContent = currentWallet.address;
+                showToast('New secure wallet generated!', 'success');
+            } catch (e) {
+                showToast('Wallet generation failed. Refresh page.', 'error');
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const referralCode = document.getElementById('referral').value.trim();
+            const btn = document.getElementById('submit-btn');
+
+            if (!username || !email || !password) {
+                return showToast('Please fill out all fields.', 'error');
+            }
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Processing...';
+
+                const response = await fetch(`${nodeUrl}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                        walletAddress: currentWallet.address,
+                        referralCode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('glitchnut-token', data.token);
+                    showToast('Welcome to Glitchnut!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'glitchnut-wallet.html';
+                    }, 1500);
+                } else {
+                    throw new Error(data.error || 'Registration failed');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
