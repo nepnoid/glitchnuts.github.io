@@ -3,286 +3,825 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Glitchnut - Game Network Coin</title>
+    <title>GNC Genesis Access</title>
     <style>
         :root {
-            --p: #6366f1;
-            --s: #8b5cf6;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --t: #f8fafc;
-            --m: #94a3b8;
-            --g: #10b981;
-            --r: #ef4444;
+            --bg-1: #050816;
+            --bg-2: #0b1430;
+            --panel: rgba(8, 17, 35, 0.9);
+            --panel-2: rgba(12, 23, 46, 0.82);
+            --border: rgba(0, 255, 65, 0.2);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --muted: #93a4bd;
+            --green: #00ff41;
+            --cyan: #00d4ff;
+            --amber: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
-            color: var(--t);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(0, 255, 65, 0.12), transparent 30%),
+                radial-gradient(circle at top right, rgba(0, 212, 255, 0.14), transparent 35%),
+                linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 55%, #02040d 100%);
+            overflow-x: hidden;
         }
 
-        .signup-container {
-            width: 100%;
-            max-width: 450px;
-            background: var(--card);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(to bottom, rgba(255,255,255,0.55), transparent 85%);
         }
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 8px;
-            text-align: center;
-            background: linear-gradient(to right, #818cf8, #c084fc);
+        .shell {
+            width: min(1220px, calc(100% - 32px));
+            margin: 32px auto;
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 28px;
+            align-items: stretch;
+        }
+
+        .panel {
+            position: relative;
+            border: 1px solid var(--border-soft);
+            border-radius: 28px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            overflow: hidden;
+        }
+
+        .panel::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(0,255,65,0.4), rgba(0,212,255,0.28), rgba(255,255,255,0.03));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .brand-panel {
+            padding: 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 760px;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0,255,65,0.08), transparent 28%),
+                radial-gradient(circle at 80% 0%, rgba(0,212,255,0.10), transparent 30%),
+                linear-gradient(180deg, rgba(0,0,0,0.12), rgba(255,255,255,0.01));
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0, 255, 65, 0.09);
+            border: 1px solid rgba(0, 255, 65, 0.18);
+            color: var(--green);
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+        }
+
+        .hero h1 {
+            margin: 20px 0 14px;
+            font-size: clamp(2.7rem, 5vw, 4.8rem);
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+        }
+
+        .hero h1 span {
+            display: block;
+            background: linear-gradient(90deg, var(--green), var(--cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 255, 65, 0.15);
         }
 
-        p.subtitle {
-            text-align: center;
-            color: var(--m);
-            margin-bottom: 32px;
-            font-size: 0.95rem;
+        .hero p {
+            max-width: 44ch;
+            color: var(--muted);
+            font-size: 1.06rem;
+            line-height: 1.7;
+            margin: 0 0 28px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
+        .stat-grid,
+        .feature-grid {
+            display: grid;
+            gap: 16px;
         }
 
-        label {
+        .stat-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin-bottom: 26px;
+        }
+
+        .stat,
+        .feature,
+        .security-card,
+        .wallet-card,
+        .input-wrap,
+        .legal {
+            background: var(--panel-2);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+        }
+
+        .stat {
+            padding: 18px;
+        }
+
+        .stat .num {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--green);
+            margin-bottom: 6px;
+        }
+
+        .stat .lbl {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .feature-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .feature {
+            padding: 18px;
+        }
+
+        .feature strong,
+        .wallet-card strong,
+        .security-card strong {
             display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.95rem;
             margin-bottom: 8px;
-            color: var(--m);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--text);
         }
 
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.2s;
+        .feature span,
+        .wallet-card span,
+        .security-card span,
+        .legal span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.55;
         }
 
-        input:focus {
-            outline: none;
-            border-color: var(--p);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        .footer-note {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 26px;
+            color: var(--muted);
+            font-size: 0.92rem;
         }
 
-        input::placeholder {
-            color: #475569;
-        }
-
-        .wallet-banner {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-        }
-
-        .wallet-label {
-            font-size: 0.75rem;
-            color: var(--p);
+        .footer-note a {
+            color: var(--green);
+            text-decoration: none;
             font-weight: 700;
-            margin-bottom: 4px;
+        }
+
+        .form-panel {
+            padding: 30px;
+        }
+
+        .terminal-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-soft);
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .lights {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lights i {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .lights i:nth-child(1) { background: #ef4444; }
+        .lights i:nth-child(2) { background: #f59e0b; }
+        .lights i:nth-child(3) { background: #10b981; }
+
+        .form-head h2 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: -0.03em;
+        }
+
+        .form-head p {
+            margin: 8px 0 24px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .wallet-card,
+        .security-card,
+        .legal {
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .wallet-card .row,
+        .security-card .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: 1px solid rgba(0,255,65,0.2);
+            color: var(--green);
+            background: rgba(0,255,65,0.07);
+        }
+
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            word-break: break-all;
         }
 
         .wallet-address {
-            font-family: 'ui-monospace', monospace;
-            font-size: 0.8rem;
-            word-break: break-all;
-            color: var(--g);
+            font-size: 0.9rem;
+            color: var(--green);
         }
 
-        button.btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--p), var(--s));
-            border: none;
-            border-radius: 12px;
-            color: white;
+        .wallet-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .mini-box {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .mini-box label {
+            display: block;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .mini-box div {
+            font-size: 0.92rem;
+            color: var(--text);
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 16px;
+            margin: 18px 0;
+        }
+
+        .input-wrap {
+            padding: 14px 14px 10px;
+        }
+
+        .input-wrap label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            margin-top: 10px;
+            color: var(--muted);
         }
 
-        button.btn:hover {
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        .input-wrap input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .input-wrap input::placeholder {
+            color: #5d708c;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 16px;
+            padding: 15px 18px;
+            font-size: 0.96rem;
+            font-weight: 800;
+            transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        button:hover {
             transform: translateY(-1px);
         }
 
-        button.btn:active {
-            transform: translateY(0);
-        }
-
-        button.btn:disabled {
-            opacity: 0.6;
+        button:disabled {
+            opacity: 0.65;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .footer-link {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.9rem;
-            color: var(--m);
+        .primary {
+            background: linear-gradient(90deg, var(--green), var(--cyan));
+            color: #03121f;
+            box-shadow: 0 18px 35px rgba(0, 255, 65, 0.18);
         }
 
-        .footer-link a {
-            color: var(--p);
-            text-decoration: none;
-            font-weight: 600;
+        .secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 16px 24px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        .checkbox {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.94rem;
+            line-height: 1.5;
+        }
+
+        .checkbox input {
+            margin-top: 3px;
+            transform: scale(1.08);
+            accent-color: var(--green);
+        }
+
+        .submit {
+            width: 100%;
+            margin-top: 14px;
+            padding: 18px;
+        }
+
+        .legal {
+            margin-top: 16px;
+        }
+
+        .status {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-weight: 700;
             display: none;
-            animation: slideIn 0.3s ease-out;
-            z-index: 1000;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .status.success {
+            display: block;
+            background: rgba(16,185,129,0.12);
+            color: #8af5c3;
+            border: 1px solid rgba(16,185,129,0.2);
         }
 
-        .success { background: var(--g); }
-        .error { background: var(--r); }
+        .status.error {
+            display: block;
+            background: rgba(239,68,68,0.12);
+            color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        .status.info {
+            display: block;
+            background: rgba(0,212,255,0.10);
+            color: #9be8ff;
+            border: 1px solid rgba(0,212,255,0.18);
+        }
+
+        .top-links {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .top-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .top-links a:hover {
+            color: var(--green);
+        }
+
+        @media (max-width: 980px) {
+            .shell {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-panel {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100%, calc(100% - 18px));
+                margin: 10px auto 22px;
+                gap: 18px;
+            }
+
+            .brand-panel,
+            .form-panel {
+                padding: 22px;
+            }
+
+            .stat-grid,
+            .feature-grid,
+            .wallet-meta,
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <main class="shell">
+        <section class="panel brand-panel">
+            <div>
+                <div class="eyebrow">⚡ GNC Genesis Access</div>
+                <div class="hero">
+                    <h1><span>Game Network</span><span>Coin</span></h1>
+                    <p>
+                        This isn’t a sleepy cookie-cutter signup page. It’s the front gate to your chain:
+                        account creation, wallet generation, and network identity forged in one pass.
+                    </p>
+                </div>
 
-    <div class="signup-container">
-        <h1>GNC Genesis</h1>
-        <p class="subtitle">Secure your spot in the network.</p>
+                <div class="stat-grid">
+                    <div class="stat">
+                        <div class="num">secp256k1</div>
+                        <div class="lbl">Real browser-side key generation. No fake toy wallet nonsense.</div>
+                    </div>
+                    <div class="stat">
+                        <div class="num">100 GNC</div>
+                        <div class="lbl">Backend signup bonus lands on the wallet address tied to the account.</div>
+                    </div>
+                    <div class="stat">
+                        <div class="num">Local</div>
+                        <div class="lbl">Private key stays in browser storage unless the user exports it.</div>
+                    </div>
+                </div>
 
-        <div id="registration-form">
-            <div class="wallet-banner">
-                <div class="wallet-label">GENERATED WALLET ADDRESS</div>
-                <div class="wallet-address" id="wallet-address-display">Generating...</div>
+                <div class="feature-grid">
+                    <div class="feature">
+                        <strong>Casino-chain energy</strong>
+                        <span>Neon GNC styling pulled toward the same green/cyan look as the main landing page instead of a generic SaaS slab.</span>
+                    </div>
+                    <div class="feature">
+                        <strong>Wallet-first signup</strong>
+                        <span>The account is born with a real public key, so the backend gets the wallet address it actually needs.</span>
+                    </div>
+                    <div class="feature">
+                        <strong>Recovery-aware</strong>
+                        <span>Users can download a wallet backup before they smash the register button and regret their life choices.</span>
+                    </div>
+                    <div class="feature">
+                        <strong>Node-aware</strong>
+                        <span>The page respects the saved node URL, so it works with local dev or whatever endpoint you point the frontend at.</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="glitchnut_king">
+            <div class="footer-note">
+                <span>Need the main landing page first?</span>
+                <a href="Index.html">Return to GNC homepage →</a>
+            </div>
+        </section>
+
+        <section class="panel form-panel">
+            <div class="top-links">
+                <a href="Index.html">← Back to site</a>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="matt@gnc.com">
+            <div class="terminal-bar">
+                <div class="lights"><i></i><i></i><i></i></div>
+                <div id="node-label">Target node: loading...</div>
             </div>
 
-            <div class="form-group">
-                <label for="password">Security Password</label>
-                <input type="password" id="password" placeholder="••••••••">
+            <div class="form-head">
+                <h2>Forge Your GNC Identity</h2>
+                <p>
+                    Generate a wallet, lock in your credentials, then register against the node.
+                    Clean, direct, and a little mean-looking — like it should be.
+                </p>
             </div>
 
-            <div class="form-group">
-                <label for="referral">Referral Code (Optional)</label>
-                <input type="text" id="referral" placeholder="GNC-XXXX-XXXX">
+            <div class="wallet-card">
+                <div class="row">
+                    <strong>Generated wallet address</strong>
+                    <span class="pill" id="wallet-state">Generating</span>
+                </div>
+                <span class="mono wallet-address" id="wallet-address-display">Preparing wallet...</span>
+
+                <div class="wallet-meta">
+                    <div class="mini-box">
+                        <label>Fingerprint</label>
+                        <div class="mono" id="wallet-fingerprint">Pending</div>
+                    </div>
+                    <div class="mini-box">
+                        <label>Storage</label>
+                        <div id="wallet-storage">localStorage</div>
+                    </div>
+                </div>
             </div>
 
-            <button class="btn" id="submit-btn" onclick="register()">Create Account</button>
-
-            <div class="footer-link">
-                Already have an account? <a href="login.html">Login</a>
+            <div class="security-card">
+                <div class="row">
+                    <strong>Wallet safety</strong>
+                    <button class="secondary" type="button" id="download-wallet-btn">Download Backup</button>
+                </div>
+                <span>
+                    Your private key is generated client-side and saved only in this browser. Export it before registering if you want an actual recovery path instead of vibes.
+                </span>
             </div>
-        </div>
-    </div>
 
-    <div id="toast" class="toast"></div>
+            <div class="form-grid">
+                <div class="input-wrap">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="housealwayswins">
+                </div>
+                <div class="input-wrap">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" placeholder="matt@gncnetwork.io">
+                </div>
+                <div class="input-wrap">
+                    <label for="password">Security password</label>
+                    <input type="password" id="password" placeholder="••••••••••••">
+                </div>
+                <div class="input-wrap">
+                    <label for="referral">Referral code</label>
+                    <input type="text" id="referral" placeholder="Optional — GNC-ALPHA-01">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="secondary" type="button" id="regen-btn">Regenerate Wallet</button>
+                <button class="secondary" type="button" id="copy-btn">Copy Address</button>
+            </div>
+
+            <label class="checkbox">
+                <input type="checkbox" id="backup-check">
+                <span>I understand this wallet is tied to my account, and if I lose the private key backup, nobody is magically rescuing me.</span>
+            </label>
+
+            <button class="primary submit" type="button" id="submit-btn">Create GNC Account</button>
+
+            <div class="legal">
+                <strong>What this page does</strong>
+                <span>
+                    Generates a secp256k1 keypair in the browser, stores the wallet locally, sends <span class="mono">walletAddress</span> with your signup payload, and redirects to the wallet view on success.
+                </span>
+            </div>
+
+            <div class="status" id="status-box"></div>
+        </section>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
     <script>
         let currentWallet = null;
-        const nodeUrl = localStorage.getItem('glitchnut-node-url') || 'http://localhost:3000';
+        let nodeUrl = localStorage.getItem('glitchnut-node-url') || 'http://localhost:3000';
 
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = `toast ${type}`;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 5000);
+        const $ = (id) => document.getElementById(id);
+
+        function setStatus(message, type = 'info') {
+            const box = $('status-box');
+            box.textContent = message;
+            box.className = `status ${type}`;
         }
 
-        function init() {
-            // Check for existing wallet
-            const saved = localStorage.getItem('glitchnut-wallet');
-            if (saved) {
-                try {
-                    currentWallet = JSON.parse(saved);
-                    document.getElementById('wallet-address-display').textContent = currentWallet.address;
-                } catch (e) {
-                    generateWallet();
+        function clearStatus() {
+            const box = $('status-box');
+            box.textContent = '';
+            box.className = 'status';
+        }
+
+        function walletFingerprint(address) {
+            if (!address) return 'Pending';
+            return `${address.slice(0, 10)}...${address.slice(-10)}`;
+        }
+
+        function updateNodeLabel() {
+            $('node-label').textContent = `Target node: ${nodeUrl}`;
+        }
+
+        function normalizeWallet(wallet) {
+            if (!wallet || !wallet.privateKey) {
+                throw new Error('Wallet is missing a private key.');
+            }
+
+            const address = wallet.address || wallet.walletAddress;
+            if (!address) {
+                throw new Error('Wallet is missing an address.');
+            }
+
+            return {
+                address,
+                walletAddress: address,
+                privateKey: wallet.privateKey,
+                createdAt: wallet.createdAt || new Date().toISOString()
+            };
+        }
+
+        function saveWallet(wallet) {
+            currentWallet = normalizeWallet(wallet);
+            localStorage.setItem('glitchnut-wallet', JSON.stringify(currentWallet));
+            renderWallet();
+        }
+
+        function renderWallet() {
+            if (!currentWallet) return;
+            $('wallet-address-display').textContent = currentWallet.address;
+            $('wallet-fingerprint').textContent = walletFingerprint(currentWallet.address);
+            $('wallet-state').textContent = 'Wallet Ready';
+        }
+
+        function generateWallet() {
+            clearStatus();
+
+            try {
+                if (typeof elliptic === 'undefined') {
+                    throw new Error('elliptic library failed to load');
                 }
-            } else {
+
+                const ec = new elliptic.ec('secp256k1');
+                const keyPair = ec.genKeyPair();
+
+                saveWallet({
+                    address: keyPair.getPublic('hex'),
+                    walletAddress: keyPair.getPublic('hex'),
+                    privateKey: keyPair.getPrivate('hex'),
+                    createdAt: new Date().toISOString()
+                });
+
+                setStatus('Fresh secp256k1 wallet generated locally.', 'success');
+            } catch (error) {
+                $('wallet-address-display').textContent = 'Wallet generation failed';
+                $('wallet-fingerprint').textContent = 'Unavailable';
+                $('wallet-state').textContent = 'Error';
+                setStatus(`Wallet generation failed: ${error.message}`, 'error');
+            }
+        }
+
+        function loadWallet() {
+            const saved = localStorage.getItem('glitchnut-wallet');
+            if (!saved) {
+                generateWallet();
+                return;
+            }
+
+            try {
+                saveWallet(JSON.parse(saved));
+                setStatus('Existing browser wallet loaded.', 'info');
+            } catch (error) {
                 generateWallet();
             }
         }
 
-        function generateWallet() {
+        function exportWallet() {
+            if (!currentWallet) {
+                setStatus('No wallet available to export yet.', 'error');
+                return;
+            }
+
+            const payload = {
+                ...currentWallet,
+                exportDate: new Date().toISOString(),
+                nodeUrl
+            };
+
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `gnc-wallet-${currentWallet.address.slice(0, 12)}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            setStatus('Wallet backup downloaded.', 'success');
+        }
+
+        async function copyAddress() {
+            if (!currentWallet) {
+                setStatus('No wallet address to copy yet.', 'error');
+                return;
+            }
+
             try {
-                const ec = new elliptic.ec('secp256k1');
-                const kp = ec.genKeyPair();
-                currentWallet = {
-                    address: kp.getPublic('hex'),
-                    walletAddress: kp.getPublic('hex'),
-                    privateKey: kp.getPrivate('hex'),
-                    createdAt: new Date().toISOString()
-                };
-                localStorage.setItem('glitchnut-wallet', JSON.stringify(currentWallet));
-                document.getElementById('wallet-address-display').textContent = currentWallet.address;
-                showToast('New secure wallet generated!', 'success');
-            } catch (e) {
-                showToast('Wallet generation failed. Refresh page.', 'error');
+                await navigator.clipboard.writeText(currentWallet.address);
+                setStatus('Wallet address copied.', 'success');
+            } catch (error) {
+                setStatus('Clipboard copy failed on this browser.', 'error');
             }
         }
 
         async function register() {
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const referralCode = document.getElementById('referral').value.trim();
-            const btn = document.getElementById('submit-btn');
+            clearStatus();
 
-            if (!username || !email || !password) {
-                return showToast('Please fill out all fields.', 'error');
+            const username = $('username').value.trim();
+            const email = $('email').value.trim();
+            const password = $('password').value;
+            const referralCode = $('referral').value.trim();
+            const acknowledgedBackup = $('backup-check').checked;
+            const submitBtn = $('submit-btn');
+
+            if (!currentWallet || !currentWallet.address) {
+                setStatus('Wallet is not ready yet. Generate one first.', 'error');
+                return;
             }
 
-            try {
-                btn.disabled = true;
-                btn.textContent = 'Processing...';
+            if (!username || !email || !password) {
+                setStatus('Username, email, and password are required.', 'error');
+                return;
+            }
 
+            if (!acknowledgedBackup) {
+                setStatus('Tick the wallet backup acknowledgement first.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Forging account...';
+
+            try {
                 const response = await fetch(`${nodeUrl}/api/register`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         username,
                         email,
@@ -292,26 +831,45 @@
                     })
                 });
 
-                const data = await response.json();
+                const data = await response.json().catch(() => ({}));
 
-                if (response.ok) {
-                    localStorage.setItem('glitchnut-token', data.token);
-                    showToast('Welcome to Glitchnut!', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'glitchnut-wallet.html';
-                    }, 1500);
-                } else {
+                if (!response.ok) {
                     throw new Error(data.error || 'Registration failed');
                 }
-            } catch (err) {
-                showToast(err.message, 'error');
+
+                if (data.token) {
+                    localStorage.setItem('glitchnut-token', data.token);
+                }
+
+                localStorage.setItem('glitchnut-user', JSON.stringify({
+                    username,
+                    email,
+                    walletAddress: currentWallet.address,
+                    registeredAt: new Date().toISOString()
+                }));
+
+                setStatus('Account created. Redirecting to wallet...', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'glitchnut-wallet.html';
+                }, 1200);
+            } catch (error) {
+                setStatus(`Registration failed: ${error.message}`, 'error');
             } finally {
-                btn.disabled = false;
-                btn.textContent = 'Create Account';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create GNC Account';
             }
         }
 
-        window.onload = init;
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNodeLabel();
+            loadWallet();
+
+            $('regen-btn').addEventListener('click', generateWallet);
+            $('download-wallet-btn').addEventListener('click', exportWallet);
+            $('copy-btn').addEventListener('click', copyAddress);
+            $('submit-btn').addEventListener('click', register);
+        });
     </script>
 </body>
 </html>
