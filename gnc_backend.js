@@ -11,7 +11,11 @@ const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'gnc_blockchain_secret_2025';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is not set.');
+    process.exit(1);
+}
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gnc_ecosystem';
 
 // Middleware
@@ -30,7 +34,6 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   walletAddress: { type: String, unique: true },
-  privateKey: { type: String },
   gncBalance: { type: Number, default: 0 },
   totalMined: { type: Number, default: 0 },
   miningPower: { type: Number, default: 1 },
@@ -99,15 +102,6 @@ class GNCBlockchain {
     this.blockHeight = 1000;
   }
 
-  generateWalletAddress() {
-    const randomBytes = crypto.randomBytes(32);
-    return 'gnc' + randomBytes.toString('hex').slice(0, 32);
-  }
-
-  generatePrivateKey() {
-    return crypto.randomBytes(32).toString('hex');
-  }
-
   generateTxHash() {
     return crypto.randomBytes(32).toString('hex');
   }
@@ -149,29 +143,26 @@ const authenticateToken = (req, res, next) => {
 
 app.post('/api/register', async (req, res) => {
   try {
-    const { username, email, password, referralCode } = req.body;
+    const { username, email, password, referralCode, walletAddress } = req.body;
 
     // Validate input
-    if (!username || !email || !password) {
-      return res.status(400).json({ error: 'All fields required' });
+    if (!username || !email || !password || !walletAddress) {
+      return res.status(400).json({ error: 'All fields including walletAddress are required' });
     }
 
     // Check if user exists
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
+      $or: [{ email }, { username }, { walletAddress }]
     });
 
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ error: 'User or Wallet already exists' });
     }
 
     // Hash password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Generate wallet
-    const walletAddress = blockchain.generateWalletAddress();
-    const privateKey = blockchain.generatePrivateKey();
     const userReferralCode = crypto.randomBytes(8).toString('hex');
 
     // Create user
@@ -180,7 +171,6 @@ app.post('/api/register', async (req, res) => {
       email,
       password: hashedPassword,
       walletAddress,
-      privateKey,
       referralCode: userReferralCode,
       referredBy: referralCode,
       gncBalance: 100 // Starting bonus
@@ -473,7 +463,7 @@ app.post('/api/faucet/claim', authenticateToken, async (req, res) => {
 
 app.get('/api/user/profile', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password -privateKey');
+    const user = await User.findById(req.user.userId).select('-password');
     
     // Get mining stats
     const miningStats = await MiningSession.aggregate([
