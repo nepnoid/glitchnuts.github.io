@@ -2,10 +2,10 @@
   "name": "gnc-backend",
   "version": "1.0.0",
   "description": "GNC - Game Network Coin blockchain backend",
-  "main": "gnc_server.js",
+  "main": "gnc_backend.js",
   "scripts": {
-    "start": "node gnc_server.js",
-    "dev": "nodemon gnc_server.js"
+    "start": "node gnc_backend.js",
+    "dev": "nodemon gnc_backend.js"
   },
   "engines": {
     "node": ">=14.0.0",
@@ -19,7 +19,8 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.3.1",
     "ws": "^8.14.2",
-    "elliptic": "^6.5.4"
+    "elliptic": "^6.5.4",
+    "node-cron": "^3.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
