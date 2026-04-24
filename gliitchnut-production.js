@@ -88,7 +88,7 @@ class Transaction {
       throw new Error('No signature in this transaction');
     }
 
-    return GliitchnutCrypto.verifySignature(
+    return GlitchnutCrypto.verifySignature(
       this.calculateHash(), 
       this.signature, 
       this.fromAddress
@@ -147,7 +147,7 @@ class Block {
   }
 
   calculateHash() {
-    return GliitchnutCrypto.sha256(
+    return GlitchnutCrypto.sha256(
       this.index +
       this.timestamp +
       this.merkleRoot +
@@ -217,8 +217,8 @@ class Block {
 
 class Wallet {
   constructor() {
-    this.keyPair = GliitchnutCrypto.generateKeyPair();
-    this.address = GliitchnutCrypto.generateAddress(this.keyPair.publicKey);
+    this.keyPair = GlitchnutCrypto.generateKeyPair();
+    this.address = GlitchnutCrypto.generateAddress(this.keyPair.publicKey);
   }
 
   getAddress() {
@@ -498,34 +498,14 @@ class Glitchnut extends EventEmitter {
   }
 
   syncWithPeer(peerChain) {
-    if (peerChain.length > this.chain.length && this.isValidChain(peerChain)) {
-      console.log('Replacing chain with longer valid chain from peer');
-      this.chain = peerChain;
-      this.saveBlockchain();
-      this.emit('chainReplaced', peerChain);
-    }
-  }
-
-  isValidChain(chain) {
-    // Validate entire chain
-    for (let i = 1; i < chain.length; i++) {
-      const currentBlock = chain[i];
-      const previousBlock = chain[i - 1];
-
-      if (currentBlock.hash !== currentBlock.calculateHash() ||
-          currentBlock.previousHash !== previousBlock.hash ||
-          !currentBlock.hasValidTransactions()) {
-        return false;
-      }
-    }
-    return true;
+    // Basic sync logic would go here
   }
 }
 
 module.exports = {
   Glitchnut,
   Transaction,
-  Block,
   Wallet,
+  Block,
   GlitchnutCrypto
 };
