@@ -12,14 +12,12 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/gnc_ecosystem', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('✅ Connected to MongoDB');
-}).catch(err => {
-    console.error('❌ MongoDB connection error:', err);
-});
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/gnc_ecosystem')
+    .then(() => {
+        console.log('✅ Connected to MongoDB');
+    }).catch(err => {
+        console.error('❌ MongoDB connection error:', err);
+    });
 
 // GNC Blockchain Simulator
 class GNCBlockchain {
@@ -98,9 +96,6 @@ const authMiddleware = async (req, res, next) => {
 };
 
 // Routes
-
-// NOTE: Registration and Login routes moved to gnc_backend.js to avoid split-personality backend issues.
-// Use /api/register and /api/login on port 3000.
 
 // Get User Profile
 app.get('/api/users/profile', authMiddleware, async (req, res) => {
