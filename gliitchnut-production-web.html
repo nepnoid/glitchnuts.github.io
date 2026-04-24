@@ -222,7 +222,7 @@
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.65;
             cursor: not-allowed;
             transform: none;
         }
@@ -394,7 +394,7 @@
             <div class="subtitle">Production Cryptocurrency Blockchain</div>
             <div style="margin-top: 15px;">
                 <span class="status-indicator status-online"></span>
-                <span id="connection-status">Connected to Local Node</span>
+                <span id="connection-status">Connecting to GNC Network...</span>
             </div>
         </div>
 
@@ -426,22 +426,22 @@
                 <h2>🏦 My Wallet</h2>
                 <div class="wallet-info">
                     <strong>Wallet Address:</strong>
-                    <div class="wallet-address" id="wallet-address">Connecting...</div>
+                    <div class="wallet-address" id="wallet-address">No wallet loaded</div>
                 </div>
                 
                 <div class="form-group">
-                    <label>Balance: <span id="wallet-balance">0 GNC</span></label>
+                    <label>Balance: <span id="wallet-balance">0.00 GNC</span></label>
                 </div>
                 
-                <button class="btn btn-success" id="generate-wallet">Generate New Wallet</button>
-                <button class="btn" id="export-wallet">Export Wallet</button>
+                <button class="btn btn-success" id="generate-wallet">Generate New secp256k1 Wallet</button>
+                <button class="btn" id="export-wallet">Export Wallet JSON</button>
             </div>
 
             <div class="card">
                 <h2>💸 Send Transaction</h2>
                 <div class="form-group">
                     <label for="recipient-address">Recipient Address:</label>
-                    <input type="text" id="recipient-address" placeholder="GNC1234567890ABCDEF...">
+                    <input type="text" id="recipient-address" placeholder="04abcdef...">
                 </div>
                 
                 <div class="form-group">
@@ -521,8 +521,9 @@
     <!-- Notification container -->
     <div id="notification"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
     <script>
-        // Production Glitchnut Web Interface
+        // Production Glitchnut Web Interface - Unified secp256k1 Version
         const API_BASE = 'http://localhost:3000/api';
         const WS_URL = 'ws://localhost:3001';
         
@@ -543,7 +544,6 @@
                 await loadBlockchainData();
                 await loadWalletData();
                 updateUI();
-                showNotification('Connected to Glitchnut network', 'success');
             } catch (error) {
                 console.error('Failed to initialize app:', error);
                 showNotification('Failed to connect to Glitchnut node', 'error');
@@ -553,30 +553,42 @@
         async function loadBlockchainData() {
             try {
                 const response = await fetch(`${API_BASE}/blockchain/stats`);
-                stats = await response.json();
+                if (response.ok) {
+                    stats = await response.json();
+                }
                 
                 const blocksResponse = await fetch(`${API_BASE}/blocks?limit=10`);
-                const blocksData = await blocksResponse.json();
-                blockchain = blocksData.blocks;
+                if (blocksResponse.ok) {
+                    const blocksData = await blocksResponse.json();
+                    blockchain = blocksData.blocks;
+                }
             } catch (error) {
                 console.error('Error loading blockchain data:', error);
-                throw error;
             }
         }
 
         async function loadWalletData() {
-            // For demo purposes, we'll simulate a wallet
-            // In production, this would load from secure storage
-            currentWallet = {
-                address: 'GNC' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-                balance: 0
-            };
-            
-            // Try to get balance from API
+            const saved = localStorage.getItem('glitchnut-wallet');
+            if (saved) {
+                try {
+                    currentWallet = JSON.parse(saved);
+                    // Ensure address field is unified
+                    currentWallet.address = currentWallet.address || currentWallet.walletAddress;
+                    await refreshBalance();
+                } catch (e) {
+                    console.error('Error loading saved wallet:', e);
+                }
+            }
+        }
+
+        async function refreshBalance() {
+            if (!currentWallet || !currentWallet.address) return;
             try {
                 const response = await fetch(`${API_BASE}/wallets/${currentWallet.address}/balance`);
-                const balanceData = await response.json();
-                currentWallet.balance = balanceData.balance;
+                if (response.ok) {
+                    const balanceData = await response.json();
+                    currentWallet.balance = balanceData.balance;
+                }
             } catch (error) {
                 console.error('Error loading wallet balance:', error);
             }
@@ -587,8 +599,8 @@
                 websocket = new WebSocket(WS_URL);
                 
                 websocket.onopen = function() {
-                    console.log('WebSocket connected');
                     document.getElementById('connection-status').textContent = 'Connected to Glitchnut Network';
+                    showNotification('WebSocket connected', 'success');
                 };
                 
                 websocket.onmessage = function(event) {
@@ -597,18 +609,11 @@
                 };
                 
                 websocket.onclose = function() {
-                    console.log('WebSocket disconnected');
                     document.getElementById('connection-status').textContent = 'Disconnected';
-                    
-                    // Attempt to reconnect after 5 seconds
                     setTimeout(connectWebSocket, 5000);
                 };
-                
-                websocket.onerror = function(error) {
-                    console.error('WebSocket error:', error);
-                };
             } catch (error) {
-                console.error('Failed to connect WebSocket:', error);
+                console.error('WebSocket connection failed');
             }
         }
 
@@ -617,6 +622,7 @@
                 case 'blockMined':
                     showNotification('New block mined!', 'success');
                     loadBlockchainData().then(updateUI);
+                    refreshBalance().then(updateUI);
                     break;
                 case 'transactionAdded':
                     showNotification('New transaction added', 'info');
@@ -632,21 +638,21 @@
 
         function updateUI() {
             if (stats) {
-                document.getElementById('total-blocks').textContent = stats.totalBlocks;
-                document.getElementById('pending-count').textContent = stats.pendingTransactions;
-                document.getElementById('mining-difficulty').textContent = stats.difficulty;
-                document.getElementById('total-supply').textContent = stats.totalSupply + ' GNC';
+                document.getElementById('total-blocks').textContent = stats.totalBlocks || 0;
+                document.getElementById('pending-count').textContent = stats.pendingTransactions || 0;
+                document.getElementById('mining-difficulty').textContent = stats.difficulty || 4;
+                document.getElementById('total-supply').textContent = (stats.totalSupply || 0) + ' GNC';
                 document.getElementById('chain-validity').innerHTML = stats.isValid ? '✅ Valid' : '❌ Invalid';
             }
             
             if (currentWallet) {
                 document.getElementById('wallet-address').textContent = currentWallet.address;
-                document.getElementById('wallet-balance').textContent = currentWallet.balance + ' GNC';
-                document.getElementById('my-balance').textContent = currentWallet.balance;
+                document.getElementById('wallet-balance').textContent = (currentWallet.balance || 0).toFixed(2) + ' GNC';
+                document.getElementById('my-balance').textContent = (currentWallet.balance || 0).toFixed(2);
             }
             
             if (blockchain && blockchain.length > 0) {
-                document.getElementById('last-block-hash').textContent = blockchain[0].hash;
+                document.getElementById('last-block-hash').textContent = blockchain[0].hash.substring(0, 32) + '...';
                 displayBlockchain();
             }
         }
@@ -669,7 +675,6 @@
                             <strong>From:</strong> ${tx.fromAddress || 'Mining Reward'}<br>
                             <strong>To:</strong> ${tx.toAddress}<br>
                             <strong>Amount:</strong> ${tx.amount} GNC
-                            ${tx.fee ? `<br><strong>Fee:</strong> ${tx.fee} GNC` : ''}
                         </div>
                     `;
                 });
@@ -680,15 +685,11 @@
                         <div class="block-time">${timestamp}</div>
                     </div>
                     <div class="block-hash">Hash: ${block.hash}</div>
-                    <div class="block-hash">Previous: ${block.previousHash}</div>
-                    <div class="block-hash">Nonce: ${block.nonce}</div>
-                    <div class="block-hash">Merkle Root: ${block.merkleRoot}</div>
                     <div>
                         <strong>Transactions (${block.transactions.length}):</strong>
-                        ${transactionsHTML || '<div class="transaction">No transactions in this block</div>'}
+                        ${transactionsHTML || '<div class="transaction">No transactions</div>'}
                     </div>
                 `;
-                
                 container.appendChild(blockElement);
             });
         }
@@ -697,49 +698,33 @@
             try {
                 const response = await fetch(`${API_BASE}/transactions/pending`);
                 const data = await response.json();
-                
                 const pendingDisplay = document.getElementById('pending-transactions-display');
                 const pendingList = document.getElementById('pending-list');
                 
-                if (data.transactions.length > 0) {
+                if (data.transactions && data.transactions.length > 0) {
                     pendingDisplay.style.display = 'block';
-                    pendingList.innerHTML = '';
-                    
-                    data.transactions.forEach(tx => {
-                        const txElement = document.createElement('div');
-                        txElement.className = 'transaction';
-                        txElement.innerHTML = `
+                    pendingList.innerHTML = data.transactions.map(tx => `
+                        <div class="transaction">
                             <strong>From:</strong> ${tx.fromAddress}<br>
                             <strong>To:</strong> ${tx.toAddress}<br>
                             <strong>Amount:</strong> ${tx.amount} GNC
-                            ${tx.fee ? `<br><strong>Fee:</strong> ${tx.fee} GNC` : ''}
-                        `;
-                        pendingList.appendChild(txElement);
-                    });
+                        </div>
+                    `).join('');
                 } else {
                     pendingDisplay.style.display = 'none';
                 }
-            } catch (error) {
-                console.error('Error updating pending transactions:', error);
-            }
+            } catch (error) {}
         }
 
         function setupEventListeners() {
-            // Send transaction
             document.getElementById('send-transaction').addEventListener('click', async () => {
+                if (!currentWallet) return showNotification('No wallet loaded', 'error');
                 const recipient = document.getElementById('recipient-address').value;
                 const amount = parseFloat(document.getElementById('amount').value);
-                const fee = parseFloat(document.getElementById('fee').value) || 0;
+                const fee = parseFloat(document.getElementById('fee').value) || 0.1;
 
-                if (!recipient || !amount) {
-                    showNotification('Please fill in all required fields', 'error');
-                    return;
-                }
-
-                if (amount + fee > currentWallet.balance) {
-                    showNotification('Insufficient balance', 'error');
-                    return;
-                }
+                if (!recipient || isNaN(amount)) return showNotification('Fill in fields', 'error');
+                if (amount + fee > currentWallet.balance) return showNotification('Insufficient balance', 'error');
 
                 try {
                     const response = await fetch(`${API_BASE}/transactions`, {
@@ -754,20 +739,17 @@
                     });
 
                     if (response.ok) {
-                        showNotification('Transaction submitted successfully!', 'success');
+                        showNotification('Transaction submitted!', 'success');
                         document.getElementById('recipient-address').value = '';
                         document.getElementById('amount').value = '';
-                        updatePendingTransactions();
-                    } else {
-                        throw new Error('Transaction failed');
                     }
-                } catch (error) {
-                    showNotification('Transaction failed: ' + error.message, 'error');
+                } catch (e) {
+                    showNotification('Failed to send', 'error');
                 }
             });
 
-            // Mine block
             document.getElementById('mine-block').addEventListener('click', async () => {
+                if (!currentWallet) return showNotification('No wallet loaded', 'error');
                 const mineButton = document.getElementById('mine-block');
                 const miningStatus = document.getElementById('mining-status');
                 
@@ -775,138 +757,65 @@
                 miningStatus.classList.add('active');
                 
                 try {
-                    const response = await fetch(`${API_BASE}/mine`, {
+                    await fetch(`${API_BASE}/mine`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            miningAddress: currentWallet.address
-                        })
+                        body: JSON.stringify({ miningAddress: currentWallet.address })
                     });
-
-                    if (response.ok) {
-                        showNotification('Mining started...', 'info');
-                    } else {
-                        throw new Error('Failed to start mining');
-                    }
-                } catch (error) {
-                    showNotification('Mining failed: ' + error.message, 'error');
+                    showNotification('Mining request sent', 'info');
+                } catch (e) {
                     mineButton.disabled = false;
                     miningStatus.classList.remove('active');
                 }
             });
 
-            // Other event listeners
-            document.getElementById('generate-wallet').addEventListener('click', generateNewWallet);
-            document.getElementById('validate-chain').addEventListener('click', validateBlockchain);
-            document.getElementById('refresh-blockchain').addEventListener('click', refreshBlockchain);
-            document.getElementById('export-wallet').addEventListener('click', exportWallet);
-            document.getElementById('export-blockchain').addEventListener('click', exportBlockchain);
-        }
-
-        async function generateNewWallet() {
-            try {
-                const response = await fetch(`${API_BASE}/wallets`, {
-                    method: 'POST'
-                });
-                
-                if (response.ok) {
-                    const walletData = await response.json();
-                    currentWallet = {
-                        address: walletData.address,
-                        balance: 0
-                    };
-                    updateUI();
-                    showNotification('New wallet generated!', 'success');
-                } else {
-                    throw new Error('Failed to generate wallet');
-                }
-            } catch (error) {
-                showNotification('Failed to generate wallet: ' + error.message, 'error');
-            }
-        }
-
-        async function validateBlockchain() {
-            try {
-                const response = await fetch(`${API_BASE}/blockchain/validate`);
-                const data = await response.json();
-                
-                showNotification(
-                    data.valid ? 'Blockchain is valid!' : 'Blockchain validation failed!',
-                    data.valid ? 'success' : 'error'
-                );
-            } catch (error) {
-                showNotification('Validation failed: ' + error.message, 'error');
-            }
-        }
-
-        async function refreshBlockchain() {
-            try {
-                await loadBlockchainData();
+            document.getElementById('generate-wallet').addEventListener('click', () => {
+                const ec = new elliptic.ec('secp256k1');
+                const key = ec.genKeyPair();
+                currentWallet = {
+                    address: key.getPublic('hex'),
+                    privateKey: key.getPrivate('hex'),
+                    balance: 0
+                };
+                localStorage.setItem('glitchnut-wallet', JSON.stringify(currentWallet));
                 updateUI();
-                showNotification('Blockchain refreshed', 'success');
-            } catch (error) {
-                showNotification('Failed to refresh: ' + error.message, 'error');
-            }
-        }
+                showNotification('New secp256k1 wallet generated!', 'success');
+            });
 
-        function exportWallet() {
-            const walletData = {
-                address: currentWallet.address,
-                balance: currentWallet.balance,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(walletData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `glitchnut-wallet-${currentWallet.address.substring(0, 8)}.json`;
-            a.click();
-            
-            URL.revokeObjectURL(url);
-            showNotification('Wallet exported successfully', 'success');
-        }
+            document.getElementById('export-wallet').addEventListener('click', () => {
+                if (!currentWallet) return;
+                const blob = new Blob([JSON.stringify(currentWallet, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `gnc-wallet-${currentWallet.address.substring(0,8)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
 
-        function exportBlockchain() {
-            const blockchainData = {
-                blockchain: blockchain,
-                stats: stats,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(blockchainData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `glitchnut-blockchain-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            
-            URL.revokeObjectURL(url);
-            showNotification('Blockchain exported successfully', 'success');
+            document.getElementById('validate-chain').addEventListener('click', async () => {
+                const r = await fetch(`${API_BASE}/blockchain/validate`);
+                const d = await r.json();
+                showNotification(d.valid ? 'Chain is valid' : 'Chain is invalid', d.valid ? 'success' : 'error');
+            });
+
+            document.getElementById('refresh-blockchain').addEventListener('click', () => {
+                loadBlockchainData().then(updateUI);
+                showNotification('Refreshed', 'info');
+            });
         }
 
         function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 4000);
+            const n = document.getElementById('notification');
+            n.textContent = message;
+            n.className = `notification ${type} show`;
+            setTimeout(() => n.classList.remove('show'), 3500);
         }
 
-        // Auto-refresh data every 30 seconds
-        setInterval(async () => {
-            try {
-                await loadBlockchainData();
-                updateUI();
-            } catch (error) {
-                console.error('Auto-refresh failed:', error);
-            }
-        }, 30000);
+        setInterval(() => {
+            loadBlockchainData().then(updateUI);
+            refreshBalance().then(updateUI);
+        }, 15000);
     </script>
 </body>
 </html>
