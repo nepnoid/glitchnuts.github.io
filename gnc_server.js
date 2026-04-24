@@ -46,11 +46,12 @@ class GNCBlockchain {
 
 const blockchain = new GNCBlockchain();
 
-// User Schema
+// User Schema (Must match gnc_backend.js)
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    walletAddress: { type: String, unique: true },
     gncBalance: { type: Number, default: 100 },
     miningPower: { type: Number, default: 1 },
     lastMined: { type: Date, default: null },
@@ -98,88 +99,10 @@ const authMiddleware = async (req, res, next) => {
 
 // Routes
 
-// Register - FIXED: No route parameters needed
-app.post('/api/auth/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        
-        // Check if user exists
-        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-        if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
-        }
-        
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-        
-        // Create user
-        const user = new User({
-            username,
-            email,
-            password: hashedPassword
-        });
-        
-        await user.save();
-        
-        // Generate token
-        const token = jwt.sign(
-            { userId: user._id }, 
-            process.env.JWT_SECRET || 'gnc_ultra_secure_secret_2025'
-        );
-        
-        res.status(201).json({
-            message: 'User created successfully',
-            token,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                gncBalance: user.gncBalance
-            }
-        });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
+// NOTE: Registration and Login routes moved to gnc_backend.js to avoid split-personality backend issues.
+// Use /api/register and /api/login on port 3000.
 
-// Login - FIXED: No route parameters needed
-app.post('/api/auth/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        
-        const token = jwt.sign(
-            { userId: user._id }, 
-            process.env.JWT_SECRET || 'gnc_ultra_secure_secret_2025'
-        );
-        
-        res.json({
-            message: 'Login successful',
-            token,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                gncBalance: user.gncBalance,
-                miningPower: user.miningPower,
-                kenoStats: user.kenoStats
-            }
-        });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-// Get User Profile - FIXED: Removed extra colon
+// Get User Profile
 app.get('/api/users/profile', authMiddleware, async (req, res) => {
     res.json({
         user: {
@@ -194,7 +117,7 @@ app.get('/api/users/profile', authMiddleware, async (req, res) => {
     });
 });
 
-// Mining Endpoint - FIXED: No route parameters needed
+// Mining Endpoint
 app.post('/api/mining/mine', authMiddleware, async (req, res) => {
     try {
         const user = req.user;
@@ -241,7 +164,7 @@ app.post('/api/mining/mine', authMiddleware, async (req, res) => {
     }
 });
 
-// Keno Game Endpoint - FIXED: No route parameters needed
+// Keno Game Endpoint
 app.post('/api/keno/play', authMiddleware, async (req, res) => {
     try {
         const { selectedNumbers, betAmount } = req.body;
@@ -329,7 +252,7 @@ app.post('/api/keno/play', authMiddleware, async (req, res) => {
     }
 });
 
-// Get Transactions - FIXED: Removed extra colon
+// Get Transactions
 app.get('/api/transactions', authMiddleware, async (req, res) => {
     try {
         const transactions = await Transaction.find({ userId: req.user._id })
@@ -342,7 +265,7 @@ app.get('/api/transactions', authMiddleware, async (req, res) => {
     }
 });
 
-// Blockchain Stats - FIXED: No route parameters needed
+// Blockchain Stats
 app.get('/api/blockchain/stats', async (req, res) => {
     res.json({
         blockHeight: blockchain.blockHeight,
