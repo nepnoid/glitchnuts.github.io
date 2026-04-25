@@ -23,10 +23,14 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(MONGODB_URI)
+    .then(() => {
+        console.log('✅ Connected to MongoDB');
+    })
+    .catch(err => {
+        console.error('❌ MongoDB connection error:', err);
+        process.exit(1);
+    });
 
 // User Schema
 const userSchema = new mongoose.Schema({
