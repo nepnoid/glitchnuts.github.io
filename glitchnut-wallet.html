@@ -56,7 +56,7 @@
       <div class="grid">
         <div class="grid g2"><button class="btn ok" onclick="createNewWallet()">Create New Wallet</button><button class="btn alt" onclick="exportWallet()">Export Wallet</button></div>
         <div><label>Import Wallet</label><input id="wallet-file" type="file" accept=".json" onchange="importWallet(event)"></div>
-        <div><label>Node URL</label><input id="node-url" value="http://localhost:3000" placeholder="http://localhost:3000"><small>Connect to a different Glitchnut node</small></div>
+        <div><label>Node URL</label><input id="node-url" value="https://glitchnuts-github-io.onrender.com" placeholder="https://glitchnuts-github-io.onrender.com"><small>Connect to a different Glitchnut node</small></div>
         <div><label>Network</label><select id="network-select"><option value="mainnet">Mainnet</option><option value="testnet" selected>Testnet</option><option value="local">Local Development</option></select></div>
         <button class="btn" onclick="saveSettings()">Save Settings</button>
         <div class="panel"><strong>⚠️ Security Reminder:</strong> Never share your private keys or wallet files with anyone. Keep backups somewhere safe.</div>
@@ -67,10 +67,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
 <script>
-let currentWallet=null,balance=0,transactions=[],nodeUrl='http://localhost:3000',isConnected=false;
+let currentWallet=null,balance=0,transactions=[],nodeUrl='https://glitchnuts-github-io.onrender.com',isConnected=false;
 const q=s=>document.querySelector(s),qa=s=>document.querySelectorAll(s);
 function toast(msg,type='info'){const old=q('#toast');if(old)old.remove();const el=document.createElement('div');el.id='toast';el.className=`toast ${type}`;el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),4500)}
-function normalizeWallet(w){if(!w) return null;const address=w.address||w.walletAddress; if(!address||!w.privateKey) throw new Error('Invalid wallet file format'); return {...w,address,walletAddress:address,createdAt:w.createdAt||new Date().toISOString()};}
+function normalizeWallet(w){if(!w) return null;const address=w.address||w.walletAddress; if(!address||!w.privateKey) throw new Error('Invalid wallet file format'); return {...w,address,walletAddress:address,createdAt:w.createdAt||new Date().toISOString()};
+}
 function saveWallet(w){currentWallet=normalizeWallet(w);localStorage.setItem('glitchnut-wallet',JSON.stringify(currentWallet));updateWalletDisplay()}
 function showTab(name){qa('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));qa('.tab').forEach(t=>t.classList.toggle('active',t.id===`${name}-tab`));if(name==='history')loadTransactionHistory()}
 qa('.nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
