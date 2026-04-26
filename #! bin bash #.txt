@@ -1,0 +1,234 @@
+# secure-upgrade.sh - Upgrade your Glitchnut to secure version
+
+echo "🔒 Upgrading Glitchnut to Secure Version"
+echo "========================================"
+
+# 1. Install additional security dependencies
+echo "📦 Installing security dependencies..."
+npm install elliptic helmet express-rate-limit winston
+
+# 2. Create secure directory structure
+echo "📁 Setting up secure directories..."
+mkdir -p glitchnut-data/{wallets,chain-backups,logs}
+chmod 700 glitchnut-data
+chmod 600 glitchnut-data/wallets
+chmod 755 glitchnut-data/logs
+
+# 3. Backup existing data
+echo "💾 Backing up existing data..."
+if [ -f "glitchnut-data/blockchain.json" ]; then
+    cp glitchnut-data/blockchain.json glitchnut-data/blockchain-backup-$(date +%Y%m%d_%H%M%S).json
+    echo "✅ Blockchain backed up"
+fi
+
+if [ -f "glitchnut-data/default-wallet.json" ]; then#!/bin/bash
+
+    cp glitchnut-data/default-wallet.json glitchnut-data/wallets/default-wallet-backup-$(date +%Y%m%d_%H%M%S).json
+    echo "✅ Wallet backed up"
+fi
+
+# 4. Create secure startup script
+cat > start-secure-glitchnut.js << 'EOF'
+#!/usr/bin/env node
+// Secure Glitchnut Startup Script
+
+const { SecureGlitchnut, SecureWallet } = require('./secure-glitchnut');
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+async function getPassword(prompt) {
+  return new Promise((resolve) => {
+    const stdin = process.stdin;
+    const stdout = process.stdout;
+    
+    stdout.write(prompt);
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding('utf8');
+    
+    let password = '';
+    stdin.on('data', function(ch) {
+      ch = ch + '';
+      
+      switch(ch) {
+        case '\n':
+        case '\r':
+        case '\u0004':
+          stdin.setRawMode(false);
+          stdin.pause();
+          stdout.write('\n');
+          resolve(password);
+          break;
+        case '\u0003':
+          process.exit();
+          break;
+        default:
+          stdout.write('*');
+          password += ch;
+          break;
+      }
+    });
+  });
+}
+
+async function startSecureMiner() {
+  console.log('🔒 Starting Secure Glitchnut Miner');
+  console.log('================================');
+  
+  // Initialize secure blockchain
+  const blockchain = new SecureGlitchnut({
+    dataDir: './glitchnut-data',
+    difficulty: 4,
+    miningReward: 50
+  });
+  
+  // Load or create secure wallet
+  let wallet;
+  const walletFile = './glitchnut-data/wallets/secure-wallet.json';
+  
+  try {
+    const password = await getPassword('Enter wallet password: ');
+    wallet = SecureWallet.loadSecure(walletFile, password);
+    console.log('✅ Wallet loaded successfully');
+  } catch (error) {
+    console.log('📝 Creating new secure wallet...');
+    const password = await getPassword('Create wallet password: ');
+    const confirmPassword = await getPassword('Confirm password: ');
+    
+    if (password !== confirmPassword) {
+      console.log('❌ Passwords do not match');
+      process.exit(1);
+    }
+    
+    wallet = new SecureWallet();
+    wallet.saveSecure(walletFile, password);
+    console.log('✅ New secure wallet created');
+  }
+  
+  console.log(`\n💰 Wallet Address: ${wallet.getAddress()}`);
+  console.log(`💎 Balance: ${blockchain.getBalanceOfAddress(wallet.getAddress())} GNC`);
+  
+  // Start mining
+  console.log('\n⛏️ Starting secure mining...');
+  console.log('Press Ctrl+C to stop\n');
+  
+  let blocksMined = 0;
+  const startTime = Date.now();
+  
+  while (true) {
+    try {
+      const block = blockchain.minePendingTransactions(wallet.getAddress());
+      blocksMined++;
+      
+      const elapsed = (Date.now() - startTime) / 1000;
+      const balance = blockchain.getBalanceOfAddress(wallet.getAddress());
+      
+      console.log(`🎉 Block #${block.index} mined! Balance: ${balance} GNC`);
+      console.log(`📊 Blocks mined: ${blocksMined}, Time: ${elapsed.toFixed(0)}s`);
+      
+      // Save progress every 5 blocks
+      if (blocksMined % 5 === 0) {
+        blockchain.saveChain();
+        console.log('💾 Progress saved');
+      }
+      
+    } catch (error) {
+      console.log(`❌ Mining error: ${error.message}`);
+      break;
+    }
+  }
+}
+
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n\n👋 Shutting down secure miner...');
+  process.exit(0);
+});
+
+startSecureMiner().catch(error => {
+  console.error('❌ Fatal error:', error.message);
+  process.exit(1);
+});
+EOF
+
+chmod +x start-secure-glitchnut.js
+
+# 5. Create monitoring script
+cat > monitor-glitchnut.sh << 'EOF'
+#!/bin/bash
+# Simple monitoring script
+
+LOG_FILE="glitchnut-data/logs/monitor.log"
+
+while true; do
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    # Check if process is running
+    if pgrep -f "glitchnut" > /dev/null; then
+        status="RUNNING"
+    else
+        status="STOPPED"
+    fi
+    
+    # Check disk space
+    disk_usage=$(df . | awk 'NR==2 {print $5}' | sed 's/%//')
+    
+    # Check memory usage
+    mem_usage=$(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100.0}')
+    
+    # Log status
+    echo "[$timestamp] Status: $status | Disk: ${disk_usage}% | Memory: ${mem_usage}%" >> "$LOG_FILE"
+    
+    # Alert if disk > 90%
+    if [ "$disk_usage" -gt 90 ]; then
+        echo "⚠️ WARNING: Disk usage is ${disk_usage}%"
+    fi
+    
+    sleep 300  # Check every 5 minutes
+done
+EOF
+
+chmod +x monitor-glitchnut.sh
+
+# 6. Create systemd service
+cat > glitchnut.service << 'EOF'
+[Unit]
+Description=Secure Glitchnut Cryptocurrency Miner
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+WorkingDirectory=$PWD
+ExecStart=$PWD/start-secure-glitchnut.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo ""
+echo "✅ Security upgrade completed!"
+echo ""
+echo "Next steps:"
+echo "1. Save the secure code files (SecureGlitchnut, SecureWallet, etc.)"
+echo "2. Run: node start-secure-glitchnut.js"
+echo "3. Set a strong wallet password"
+echo "4. Start mining securely!"
+echo ""
+echo "Optional:"
+echo "- Install as service: sudo cp glitchnut.service /etc/systemd/system/"
+echo "- Start monitoring: ./monitor-glitchnut.sh &"
+echo ""
+echo "🔒 Your Glitchnut is now secure!"

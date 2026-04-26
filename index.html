@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitchnut - Production Cryptocurrency</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --white: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --success: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, #f0f9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online { background: var(--accent); }
+        .status-mining { background: var(--warning); animation: pulse 2s infinite; }
+        .status-offline { background: var(--danger); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .stat-card .value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success { background: linear-gradient(135deg, var(--accent), var(--success)); }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #f97316); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); }
+
+        .wallet-info {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-address {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .blockchain-explorer {
+            grid-column: span 2;
+        }
+
+        .block {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .block::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 4px 0 0 4px;
+        }
+
+        .block:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .block-index {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .block-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .block-hash {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.8rem;
+            background: var(--light);
+            padding: 10px;
+            border-radius: 6px;
+            word-break: break-all;
+            margin: 10px 0;
+            border-left: 3px solid var(--primary);
+        }
+
+        .transaction {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .transaction:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .transaction-mining {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border-left-color: var(--warning);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: var(--accent); }
+        .notification.error { background: var(--danger); }
+        .notification.warning { background: var(--warning); }
+        .notification.info { background: var(--primary); }
+
+        .mining-status {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(45deg, var(--warning), #f97316);
+            color: white;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .mining-status.active {
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .blockchain-explorer {
+                grid-column: span 1;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Glitchnut</h1>
+            <div class="subtitle">Production Cryptocurrency Blockchain</div>
+            <div style="margin-top: 15px;">
+                <span class="status-indicator status-online"></span>
+                <span id="connection-status">Connected to Local Node</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">⛏️</div>
+                <div class="value" id="total-blocks">0</div>
+                <div class="label">Blocks Mined</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">💰</div>
+                <div class="value" id="my-balance">0</div>
+                <div class="label">My GNC Balance</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🔄</div>
+                <div class="value" id="pending-count">0</div>
+                <div class="label">Pending Transactions</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">⚡</div>
+                <div class="value" id="mining-difficulty">4</div>
+                <div class="label">Mining Difficulty</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2>🏦 My Wallet</h2>
+                <div class="wallet-info">
+                    <strong>Wallet Address:</strong>
+                    <div class="wallet-address" id="wallet-address">Connecting...</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Balance: <span id="wallet-balance">0 GNC</span></label>
+                </div>
+                
+                <button class="btn btn-success" id="generate-wallet">Generate New Wallet</button>
+                <button class="btn" id="export-wallet">Export Wallet</button>
+            </div>
+
+            <div class="card">
+                <h2>💸 Send Transaction</h2>
+                <div class="form-group">
+                    <label for="recipient-address">Recipient Address:</label>
+                    <input type="text" id="recipient-address" placeholder="GNC1234567890ABCDEF...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Amount (GNC):</label>
+                    <input type="number" id="amount" placeholder="0.00" min="0" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="fee">Transaction Fee (GNC):</label>
+                    <input type="number" id="fee" placeholder="0.1" min="0" step="0.01" value="0.1">
+                </div>
+                
+                <button class="btn" id="send-transaction">Send Glitchnut</button>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2>⛏️ Mining</h2>
+                <p>Mine new blocks to earn Glitchnut rewards!</p>
+                
+                <div class="form-group">
+                    <label>Mining Reward: <strong>50 GNC + fees</strong></label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Estimated Mining Time: <span id="mining-time">~2-5 minutes</span></label>
+                </div>
+                
+                <button class="btn btn-warning" id="mine-block">Start Mining</button>
+                
+                <div id="mining-status" class="mining-status">
+                    <div>⛏️ Mining in progress...</div>
+                    <div id="mining-progress">Calculating proof of work...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Network Status</h2>
+                <div class="form-group">
+                    <label>Blockchain Valid: <span id="chain-validity">✅ Valid</span></label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Total Supply: <span id="total-supply">0 GNC</span></label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Last Block Hash:</label>
+                    <div class="wallet-address" id="last-block-hash">Loading...</div>
+                </div>
+                
+                <button class="btn" id="validate-chain">Validate Blockchain</button>
+                <button class="btn btn-success" id="sync-network">Sync Network</button>
+            </div>
+        </div>
+
+        <div class="card blockchain-explorer">
+            <h2>⛓️ Blockchain Explorer</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <button class="btn" id="refresh-blockchain">Refresh</button>
+                <button class="btn" id="export-blockchain">Export Blockchain</button>
+            </div>
+            
+            <div id="pending-transactions-display" style="display: none;">
+                <h3 style="color: var(--warning); margin-bottom: 15px;">⏳ Pending Transactions</h3>
+                <div id="pending-list"></div>
+            </div>
+            
+            <div id="blockchain-container">
+                <div id="blockchain-blocks"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification container -->
+    <div id="notification"></div>
+
+    <script>
+        // Production Glitchnut Web Interface
+        const API_BASE = 'http://localhost:3000/api';
+        const WS_URL = 'ws://localhost:3001';
+        
+        let websocket = null;
+        let currentWallet = null;
+        let blockchain = null;
+        let stats = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            connectWebSocket();
+        });
+
+        async function initializeApp() {
+            try {
+                await loadBlockchainData();
+                await loadWalletData();
+                updateUI();
+                showNotification('Connected to Glitchnut network', 'success');
+            } catch (error) {
+                console.error('Failed to initialize app:', error);
+                showNotification('Failed to connect to Glitchnut node', 'error');
+            }
+        }
+
+        async function loadBlockchainData() {
+            try {
+                const response = await fetch(`${API_BASE}/blockchain/stats`);
+                stats = await response.json();
+                
+                const blocksResponse = await fetch(`${API_BASE}/blocks?limit=10`);
+                const blocksData = await blocksResponse.json();
+                blockchain = blocksData.blocks;
+            } catch (error) {
+                console.error('Error loading blockchain data:', error);
+                throw error;
+            }
+        }
+
+        async function loadWalletData() {
+            // For demo purposes, we'll simulate a wallet
+            // In production, this would load from secure storage
+            currentWallet = {
+                address: 'GNC' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+                balance: 0
+            };
+            
+            // Try to get balance from API
+            try {
+                const response = await fetch(`${API_BASE}/wallets/${currentWallet.address}/balance`);
+                const balanceData = await response.json();
+                currentWallet.balance = balanceData.balance;
+            } catch (error) {
+                console.error('Error loading wallet balance:', error);
+            }
+        }
+
+        function connectWebSocket() {
+            try {
+                websocket = new WebSocket(WS_URL);
+                
+                websocket.onopen = function() {
+                    console.log('WebSocket connected');
+                    document.getElementById('connection-status').textContent = 'Connected to Glitchnut Network';
+                };
+                
+                websocket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+                
+                websocket.onclose = function() {
+                    console.log('WebSocket disconnected');
+                    document.getElementById('connection-status').textContent = 'Disconnected';
+                    
+                    // Attempt to reconnect after 5 seconds
+                    setTimeout(connectWebSocket, 5000);
+                };
+                
+                websocket.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                };
+            } catch (error) {
+                console.error('Failed to connect WebSocket:', error);
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'blockMined':
+                    showNotification('New block mined!', 'success');
+                    loadBlockchainData().then(updateUI);
+                    break;
+                case 'transactionAdded':
+                    showNotification('New transaction added', 'info');
+                    updatePendingTransactions();
+                    break;
+                case 'chainUpdate':
+                    stats = data.data.stats;
+                    blockchain = data.data.chain.slice(-10).reverse();
+                    updateUI();
+                    break;
+            }
+        }
+
+        function updateUI() {
+            if (stats) {
+                document.getElementById('total-blocks').textContent = stats.totalBlocks;
+                document.getElementById('pending-count').textContent = stats.pendingTransactions;
+                document.getElementById('mining-difficulty').textContent = stats.difficulty;
+                document.getElementById('total-supply').textContent = stats.totalSupply + ' GNC';
+                document.getElementById('chain-validity').innerHTML = stats.isValid ? '✅ Valid' : '❌ Invalid';
+            }
+            
+            if (currentWallet) {
+                document.getElementById('wallet-address').textContent = currentWallet.address;
+                document.getElementById('wallet-balance').textContent = currentWallet.balance + ' GNC';
+                document.getElementById('my-balance').textContent = currentWallet.balance;
+            }
+            
+            if (blockchain && blockchain.length > 0) {
+                document.getElementById('last-block-hash').textContent = blockchain[0].hash;
+                displayBlockchain();
+            }
+        }
+
+        function displayBlockchain() {
+            const container = document.getElementById('blockchain-blocks');
+            container.innerHTML = '';
+
+            blockchain.forEach(block => {
+                const blockElement = document.createElement('div');
+                blockElement.className = 'block';
+                
+                const timestamp = new Date(block.timestamp).toLocaleString();
+                
+                let transactionsHTML = '';
+                block.transactions.forEach(tx => {
+                    const isMining = tx.fromAddress === null;
+                    transactionsHTML += `
+                        <div class="transaction ${isMining ? 'transaction-mining' : ''}">
+                            <strong>From:</strong> ${tx.fromAddress || 'Mining Reward'}<br>
+                            <strong>To:</strong> ${tx.toAddress}<br>
+                            <strong>Amount:</strong> ${tx.amount} GNC
+                            ${tx.fee ? `<br><strong>Fee:</strong> ${tx.fee} GNC` : ''}
+                        </div>
+                    `;
+                });
+
+                blockElement.innerHTML = `
+                    <div class="block-header">
+                        <div class="block-index">Block #${block.index}</div>
+                        <div class="block-time">${timestamp}</div>
+                    </div>
+                    <div class="block-hash">Hash: ${block.hash}</div>
+                    <div class="block-hash">Previous: ${block.previousHash}</div>
+                    <div class="block-hash">Nonce: ${block.nonce}</div>
+                    <div class="block-hash">Merkle Root: ${block.merkleRoot}</div>
+                    <div>
+                        <strong>Transactions (${block.transactions.length}):</strong>
+                        ${transactionsHTML || '<div class="transaction">No transactions in this block</div>'}
+                    </div>
+                `;
+                
+                container.appendChild(blockElement);
+            });
+        }
+
+        async function updatePendingTransactions() {
+            try {
+                const response = await fetch(`${API_BASE}/transactions/pending`);
+                const data = await response.json();
+                
+                const pendingDisplay = document.getElementById('pending-transactions-display');
+                const pendingList = document.getElementById('pending-list');
+                
+                if (data.transactions.length > 0) {
+                    pendingDisplay.style.display = 'block';
+                    pendingList.innerHTML = '';
+                    
+                    data.transactions.forEach(tx => {
+                        const txElement = document.createElement('div');
+                        txElement.className = 'transaction';
+                        txElement.innerHTML = `
+                            <strong>From:</strong> ${tx.fromAddress}<br>
+                            <strong>To:</strong> ${tx.toAddress}<br>
+                            <strong>Amount:</strong> ${tx.amount} GNC
+                            ${tx.fee ? `<br><strong>Fee:</strong> ${tx.fee} GNC` : ''}
+                        `;
+                        pendingList.appendChild(txElement);
+                    });
+                } else {
+                    pendingDisplay.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error updating pending transactions:', error);
+            }
+        }
+
+        function setupEventListeners() {
+            // Send transaction
+            document.getElementById('send-transaction').addEventListener('click', async () => {
+                const recipient = document.getElementById('recipient-address').value;
+                const amount = parseFloat(document.getElementById('amount').value);
+                const fee = parseFloat(document.getElementById('fee').value) || 0;
+
+                if (!recipient || !amount) {
+                    showNotification('Please fill in all required fields', 'error');
+                    return;
+                }
+
+                if (amount + fee > currentWallet.balance) {
+                    showNotification('Insufficient balance', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE}/transactions`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fromAddress: currentWallet.address,
+                            toAddress: recipient,
+                            amount: amount,
+                            fee: fee
+                        })
+                    });
+
+                    if (response.ok) {
+                        showNotification('Transaction submitted successfully!', 'success');
+                        document.getElementById('recipient-address').value = '';
+                        document.getElementById('amount').value = '';
+                        updatePendingTransactions();
+                    } else {
+                        throw new Error('Transaction failed');
+                    }
+                } catch (error) {
+                    showNotification('Transaction failed: ' + error.message, 'error');
+                }
+            });
+
+            // Mine block
+            document.getElementById('mine-block').addEventListener('click', async () => {
+                const mineButton = document.getElementById('mine-block');
+                const miningStatus = document.getElementById('mining-status');
+                
+                mineButton.disabled = true;
+                miningStatus.classList.add('active');
+                
+                try {
+                    const response = await fetch(`${API_BASE}/mine`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            miningAddress: currentWallet.address
+                        })
+                    });
+
+                    if (response.ok) {
+                        showNotification('Mining started...', 'info');
+                    } else {
+                        throw new Error('Failed to start mining');
+                    }
+                } catch (error) {
+                    showNotification('Mining failed: ' + error.message, 'error');
+                    mineButton.disabled = false;
+                    miningStatus.classList.remove('active');
+                }
+            });
+
+            // Other event listeners
+            document.getElementById('generate-wallet').addEventListener('click', generateNewWallet);
+            document.getElementById('validate-chain').addEventListener('click', validateBlockchain);
+            document.getElementById('refresh-blockchain').addEventListener('click', refreshBlockchain);
+            document.getElementById('export-wallet').addEventListener('click', exportWallet);
+            document.getElementById('export-blockchain').addEventListener('click', exportBlockchain);
+        }
+
+        async function generateNewWallet() {
+            try {
+                const response = await fetch(`${API_BASE}/wallets`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const walletData = await response.json();
+                    currentWallet = {
+                        address: walletData.address,
+                        balance: 0
+                    };
+                    updateUI();
+                    showNotification('New wallet generated!', 'success');
+                } else {
+                    throw new Error('Failed to generate wallet');
+                }
+            } catch (error) {
+                showNotification('Failed to generate wallet: ' + error.message, 'error');
+            }
+        }
+
+        async function validateBlockchain() {
+            try {
+                const response = await fetch(`${API_BASE}/blockchain/validate`);
+                const data = await response.json();
+                
+                showNotification(
+                    data.valid ? 'Blockchain is valid!' : 'Blockchain validation failed!',
+                    data.valid ? 'success' : 'error'
+                );
+            } catch (error) {
+                showNotification('Validation failed: ' + error.message, 'error');
+            }
+        }
+
+        async function refreshBlockchain() {
+            try {
+                await loadBlockchainData();
+                updateUI();
+                showNotification('Blockchain refreshed', 'success');
+            } catch (error) {
+                showNotification('Failed to refresh: ' + error.message, 'error');
+            }
+        }
+
+        function exportWallet() {
+            const walletData = {
+                address: currentWallet.address,
+                balance: currentWallet.balance,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(walletData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `glitchnut-wallet-${currentWallet.address.substring(0, 8)}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('Wallet exported successfully', 'success');
+        }
+
+        function exportBlockchain() {
+            const blockchainData = {
+                blockchain: blockchain,
+                stats: stats,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(blockchainData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `glitchnut-blockchain-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('Blockchain exported successfully', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Auto-refresh data every 30 seconds
+        setInterval(async () => {
+            try {
+                await loadBlockchainData();
+                updateUI();
+            } catch (error) {
+                console.error('Auto-refresh failed:', error);
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

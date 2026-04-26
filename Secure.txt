@@ -1,0 +1,618 @@
+// Secure Glitchnut Cryptocurrency Implementation
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
+
+// Enhanced Security Configuration
+const SECURITY_CONFIG = {
+  // Encryption settings
+  WALLET_ENCRYPTION: {
+    algorithm: 'aes-256-gcm',
+    keyDerivation: 'pbkdf2',
+    iterations: 100000,
+    saltLength: 32,
+    ivLength: 16,
+    tagLength: 16
+  },
+  
+  // Mining security
+  MIN_DIFFICULTY: 4,
+  MAX_DIFFICULTY: 20,
+  
+  // Transaction security
+  MAX_TRANSACTION_SIZE: 1000000, // 1MB
+  MIN_TRANSACTION_FEE: 0.0001,
+  MAX_TRANSACTION_AMOUNT: 1000000,
+  
+  // Network security
+  MAX_CONNECTIONS: 50,
+  CONNECTION_TIMEOUT: 30000,
+  
+  // File security
+  FILE_PERMISSIONS: 0o600, // Read/write for owner only
+  BACKUP_RETENTION: 10
+};
+
+class SecureWallet {
+  constructor() {
+    this.keyPair = ec.genKeyPair();
+    this.publicKey = this.keyPair.getPublic('hex');
+    this.privateKey = this.keyPair.getPrivate('hex');
+    this.address = this.generateAddress();
+  }
+
+  generateAddress() {
+    // Create a more secure address using proper hashing
+    const publicKeyBuffer = Buffer.from(this.publicKey, 'hex');
+    const hash1 = crypto.createHash('sha256').update(publicKeyBuffer).digest();
+    const hash2 = crypto.createHash('ripemd160').update(hash1).digest();
+    
+    // Add version byte and checksum (simplified)
+    const version = Buffer.from([0x00]); // Version byte for mainnet
+    const payload = Buffer.concat([version, hash2]);
+    const checksum = crypto.createHash('sha256').update(
+      crypto.createHash('sha256').update(payload).digest()
+    ).digest().slice(0, 4);
+    
+    const address = Buffer.concat([payload, checksum]);
+    return 'GNC' + address.toString('base58'); // You'd need base58 library
+  }
+
+  // Encrypt private key with password
+  encryptPrivateKey(password) {
+    const salt = crypto.randomBytes(SECURITY_CONFIG.WALLET_ENCRYPTION.saltLength);
+    const iv = crypto.randomBytes(SECURITY_CONFIG.WALLET_ENCRYPTION.ivLength);
+    
+    // Derive key from password
+    const key = crypto.pbkdf2Sync(
+      password,
+      salt,
+      SECURITY_CONFIG.WALLET_ENCRYPTION.iterations,
+      32,
+      'sha256'
+    );
+    
+    const cipher = crypto.createCipher(SECURITY_CONFIG.WALLET_ENCRYPTION.algorithm, key);
+    cipher.setAutoPadding(true);
+    
+    let encrypted = cipher.update(this.privateKey, 'hex', 'hex');
+    encrypted += cipher.final('hex');
+    
+    const tag = cipher.getAuthTag();
+    
+    return {
+      encrypted,
+      salt: salt.toString('hex'),
+      iv: iv.toString('hex'),
+      tag: tag.toString('hex')
+    };
+  }
+
+  // Decrypt private key with password
+  static decryptPrivateKey(encryptedData, password) {
+    const salt = Buffer.from(encryptedData.salt, 'hex');
+    const iv = Buffer.from(encryptedData.iv, 'hex');
+    const tag = Buffer.from(encryptedData.tag, 'hex');
+    
+    // Derive key from password
+    const key = crypto.pbkdf2Sync(
+      password,
+      salt,
+      SECURITY_CONFIG.WALLET_ENCRYPTION.iterations,
+      32,
+      'sha256'
+    );
+    
+    const decipher = crypto.createDecipher(SECURITY_CONFIG.WALLET_ENCRYPTION.algorithm, key);
+    decipher.setAuthTag(tag);
+    
+    let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'hex');
+    decrypted += decipher.final('hex');
+    
+    return decrypted;
+  }
+
+  // Secure wallet saving with password protection
+  saveSecure(filename, password) {
+    const encryptedPrivateKey = this.encryptPrivateKey(password);
+    
+    const walletData = {
+      version: '1.0.0',
+      address: this.address,
+      publicKey: this.publicKey,
+      encryptedPrivateKey,
+      createdAt: new Date().toISOString(),
+      checksum: this.calculateChecksum()
+    };
+
+    // Ensure directory exists with secure permissions
+    const dir = path.dirname(filename);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    }
+
+    // Write file with secure permissions
+    fs.writeFileSync(filename, JSON.stringify(walletData, null, 2), { mode: SECURITY_CONFIG.FILE_PERMISSIONS });
+    
+    // Create backup
+    this.createBackup(filename);
+    
+    return filename;
+  }
+
+  calculateChecksum() {
+    const data = this.address + this.publicKey;
+    return crypto.createHash('sha256').update(data).digest('hex');
+  }
+
+  createBackup(filename) {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupDir = path.join(path.dirname(filename), 'backups');
+    
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { mode: 0o700 });
+    }
+    
+    const backupFile = path.join(backupDir, `wallet-backup-${timestamp}.json`);
+    fs.copyFileSync(filename, backupFile);
+    
+    // Cleanup old backups
+    this.cleanupOldBackups(backupDir);
+  }
+
+  cleanupOldBackups(backupDir) {
+    const files = fs.readdirSync(backupDir)
+      .filter(file => file.startsWith('wallet-backup-'))
+      .map(file => ({
+        name: file,
+        path: path.join(backupDir, file),
+        mtime: fs.statSync(path.join(backupDir, file)).mtime
+      }))
+      .sort((a, b) => b.mtime - a.mtime);
+
+    // Keep only the most recent backups
+    if (files.length > SECURITY_CONFIG.BACKUP_RETENTION) {
+      files.slice(SECURITY_CONFIG.BACKUP_RETENTION).forEach(file => {
+        fs.unlinkSync(file.path);
+      });
+    }
+  }
+
+  // Load wallet with password verification
+  static loadSecure(filename, password) {
+    if (!fs.existsSync(filename)) {
+      throw new Error('Wallet file not found');
+    }
+
+    const walletData = JSON.parse(fs.readFileSync(filename, 'utf8'));
+    
+    // Verify wallet integrity
+    if (!walletData.version || !walletData.checksum) {
+      throw new Error('Invalid wallet file format');
+    }
+
+    try {
+      const privateKey = SecureWallet.decryptPrivateKey(walletData.encryptedPrivateKey, password);
+      
+      const wallet = new SecureWallet();
+      wallet.keyPair = ec.keyFromPrivate(privateKey, 'hex');
+      wallet.publicKey = walletData.publicKey;
+      wallet.privateKey = privateKey;
+      wallet.address = walletData.address;
+      
+      // Verify checksum
+      const expectedChecksum = wallet.calculateChecksum();
+      if (expectedChecksum !== walletData.checksum) {
+        throw new Error('Wallet checksum verification failed');
+      }
+      
+      return wallet;
+    } catch (error) {
+      throw new Error('Invalid password or corrupted wallet file');
+    }
+  }
+
+  // Secure transaction signing
+  signTransaction(transaction) {
+    if (this.address !== transaction.fromAddress) {
+      throw new Error('Cannot sign transaction for different address');
+    }
+
+    // Validate transaction before signing
+    this.validateTransaction(transaction);
+    
+    const txHash = transaction.calculateHash();
+    const signature = this.keyPair.sign(txHash);
+    
+    transaction.signature = {
+      r: signature.r.toString('hex'),
+      s: signature.s.toString('hex'),
+      recoveryParam: signature.recoveryParam
+    };
+    
+    // Add timestamp and nonce for replay attack protection
+    transaction.signatureTimestamp = Date.now();
+    transaction.nonce = crypto.randomBytes(16).toString('hex');
+  }
+
+  validateTransaction(transaction) {
+    if (!transaction.fromAddress || !transaction.toAddress) {
+      throw new Error('Invalid transaction addresses');
+    }
+    
+    if (transaction.amount <= 0 || transaction.amount > SECURITY_CONFIG.MAX_TRANSACTION_AMOUNT) {
+      throw new Error('Invalid transaction amount');
+    }
+    
+    if (transaction.fee < SECURITY_CONFIG.MIN_TRANSACTION_FEE) {
+      throw new Error('Transaction fee too low');
+    }
+    
+    // Check for common attack patterns
+    if (transaction.fromAddress === transaction.toAddress) {
+      throw new Error('Cannot send to same address');
+    }
+  }
+}
+
+class SecureTransaction {
+  constructor(fromAddress, toAddress, amount, fee = SECURITY_CONFIG.MIN_TRANSACTION_FEE) {
+    this.fromAddress = fromAddress;
+    this.toAddress = toAddress;
+    this.amount = amount;
+    this.fee = fee;
+    this.timestamp = Date.now();
+    this.version = 1;
+    this.hash = this.calculateHash();
+    this.signature = null;
+    this.nonce = null;
+    this.signatureTimestamp = null;
+  }
+
+  calculateHash() {
+    const data = this.fromAddress + this.toAddress + this.amount + 
+                 this.fee + this.timestamp + this.version;
+    return crypto.createHash('sha256').update(data).digest('hex');
+  }
+
+  isValid() {
+    // Mining rewards don't need signatures
+    if (this.fromAddress === null) return true;
+
+    if (!this.signature) {
+      throw new Error('Transaction not signed');
+    }
+
+    // Verify signature timestamp (prevent replay attacks)
+    const maxAge = 5 * 60 * 1000; // 5 minutes
+    if (Date.now() - this.signatureTimestamp > maxAge) {
+      throw new Error('Transaction signature expired');
+    }
+
+    try {
+      const publicKey = ec.keyFromPublic(this.fromAddress.substring(3), 'hex'); // Remove 'GNC' prefix
+      const txHash = this.calculateHash();
+      
+      return publicKey.verify(txHash, {
+        r: this.signature.r,
+        s: this.signature.s
+      });
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Add additional validation
+  validateSecurity() {
+    // Check transaction size
+    const txSize = JSON.stringify(this).length;
+    if (txSize > SECURITY_CONFIG.MAX_TRANSACTION_SIZE) {
+      throw new Error('Transaction too large');
+    }
+
+    // Validate addresses format
+    if (!this.isValidAddress(this.fromAddress) || !this.isValidAddress(this.toAddress)) {
+      throw new Error('Invalid address format');
+    }
+
+    // Check for suspicious patterns
+    if (this.amount === 0 || this.fee < 0) {
+      throw new Error('Invalid transaction values');
+    }
+  }
+
+  isValidAddress(address) {
+    // Basic address validation
+    return address && address.startsWith('GNC') && address.length > 10;
+  }
+}
+
+class SecureBlock {
+  constructor(index, timestamp, transactions, previousHash = '') {
+    this.index = index;
+    this.timestamp = timestamp;
+    this.transactions = transactions;
+    this.previousHash = previousHash;
+    this.merkleRoot = this.calculateMerkleRoot();
+    this.nonce = 0;
+    this.hash = this.calculateHash();
+    this.version = 1;
+  }
+
+  calculateMerkleRoot() {
+    if (this.transactions.length === 0) {
+      return crypto.createHash('sha256').update('').digest('hex');
+    }
+
+    let level = this.transactions.map(tx => tx.hash);
+    
+    while (level.length > 1) {
+      const nextLevel = [];
+      
+      for (let i = 0; i < level.length; i += 2) {
+        const left = level[i];
+        const right = i + 1 < level.length ? level[i + 1] : left; // Handle odd number
+        
+        const combined = crypto.createHash('sha256')
+          .update(left + right)
+          .digest('hex');
+        nextLevel.push(combined);
+      }
+      
+      level = nextLevel;
+    }
+    
+    return level[0];
+  }
+
+  calculateHash() {
+    const data = this.index + this.timestamp + this.merkleRoot + 
+                 this.previousHash + this.nonce + this.version;
+    return crypto.createHash('sha256').update(data).digest('hex');
+  }
+
+  mineBlock(difficulty) {
+    // Validate difficulty range
+    if (difficulty < SECURITY_CONFIG.MIN_DIFFICULTY || difficulty > SECURITY_CONFIG.MAX_DIFFICULTY) {
+      throw new Error('Invalid mining difficulty');
+    }
+
+    const target = Array(difficulty + 1).join('0');
+    const startTime = Date.now();
+    let attempts = 0;
+    
+    console.log(`🔒 Secure mining with difficulty ${difficulty}...`);
+    
+    while (this.hash.substring(0, difficulty) !== target) {
+      this.nonce++;
+      attempts++;
+      this.hash = this.calculateHash();
+      
+      // Security: Prevent infinite loops
+      if (attempts > 10000000) {
+        throw new Error('Mining timeout - difficulty too high');
+      }
+      
+      if (attempts % 100000 === 0) {
+        console.log(`Mining attempts: ${attempts}`);
+        
+        // Check if we should stop (e.g., network found a block)
+        if (this.shouldStopMining()) {
+          throw new Error('Mining interrupted by network');
+        }
+      }
+    }
+    
+    const endTime = Date.now();
+    const miningTime = (endTime - startTime) / 1000;
+    
+    console.log(`✅ Block mined securely! (${miningTime.toFixed(2)}s, ${attempts} attempts)`);
+    return this;
+  }
+
+  shouldStopMining() {
+    // In a real implementation, check if another miner found a block
+    return false;
+  }
+
+  validateBlock(previousBlock) {
+    // Validate block structure
+    if (this.index !== previousBlock.index + 1) {
+      return false;
+    }
+    
+    if (this.previousHash !== previousBlock.hash) {
+      return false;
+    }
+    
+    if (this.hash !== this.calculateHash()) {
+      return false;
+    }
+    
+    if (this.merkleRoot !== this.calculateMerkleRoot()) {
+      return false;
+    }
+    
+    // Validate all transactions
+    for (const tx of this.transactions) {
+      if (!tx.isValid()) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+}
+
+class SecureGlitchnut {
+  constructor(options = {}) {
+    this.dataDir = options.dataDir || './secure-glitchnut-data';
+    this.difficulty = Math.max(options.difficulty || 4, SECURITY_CONFIG.MIN_DIFFICULTY);
+    this.miningReward = options.miningReward || 50;
+    this.chain = [];
+    this.pendingTransactions = [];
+    this.transactionPool = new Map(); // For deduplication
+    
+    this.initializeSecurely();
+  }
+
+  initializeSecurely() {
+    // Create secure data directory
+    if (!fs.existsSync(this.dataDir)) {
+      fs.mkdirSync(this.dataDir, { recursive: true, mode: 0o700 });
+    }
+    
+    this.loadChain();
+    
+    if (this.chain.length === 0) {
+      this.chain = [this.createGenesisBlock()];
+      this.saveChain();
+    }
+  }
+
+  createGenesisBlock() {
+    const genesisBlock = new SecureBlock(0, Date.now(), [], "0");
+    genesisBlock.hash = genesisBlock.calculateHash();
+    return genesisBlock;
+  }
+
+  addTransaction(transaction) {
+    // Security validations
+    transaction.validateSecurity();
+    
+    if (!transaction.isValid()) {
+      throw new Error('Invalid transaction signature');
+    }
+    
+    // Check for double spending
+    if (this.transactionPool.has(transaction.hash)) {
+      throw new Error('Duplicate transaction detected');
+    }
+    
+    // Validate sender balance
+    const senderBalance = this.getBalanceOfAddress(transaction.fromAddress);
+    if (senderBalance < transaction.amount + transaction.fee) {
+      throw new Error('Insufficient balance');
+    }
+    
+    // Add to pool
+    this.transactionPool.set(transaction.hash, transaction);
+    this.pendingTransactions.push(transaction);
+    
+    console.log('✅ Secure transaction added to pool');
+  }
+
+  getBalanceOfAddress(address) {
+    let balance = 0;
+    const spent = new Set(); // Track spent transaction outputs
+    
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        // Skip if transaction was already spent
+        if (spent.has(tx.hash)) continue;
+        
+        if (tx.fromAddress === address) {
+          balance -= (tx.amount + tx.fee);
+          spent.add(tx.hash);
+        }
+        if (tx.toAddress === address) {
+          balance += tx.amount;
+        }
+      }
+    }
+    
+    return balance;
+  }
+
+  isChainValid() {
+    for (let i = 1; i < this.chain.length; i++) {
+      const currentBlock = this.chain[i];
+      const previousBlock = this.chain[i - 1];
+      
+      if (!currentBlock.validateBlock(previousBlock)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  saveChain() {
+    const chainFile = path.join(this.dataDir, 'secure-blockchain.json');
+    const tempFile = chainFile + '.tmp';
+    
+    const chainData = {
+      version: '1.0.0',
+      chain: this.chain,
+      difficulty: this.difficulty,
+      miningReward: this.miningReward,
+      pendingTransactions: this.pendingTransactions,
+      timestamp: Date.now(),
+      checksum: this.calculateChainChecksum()
+    };
+    
+    // Write to temp file first, then atomic rename
+    fs.writeFileSync(tempFile, JSON.stringify(chainData, null, 2), { mode: SECURITY_CONFIG.FILE_PERMISSIONS });
+    fs.renameSync(tempFile, chainFile);
+    
+    // Create backup
+    this.createChainBackup(chainFile);
+  }
+
+  calculateChainChecksum() {
+    const chainString = JSON.stringify(this.chain);
+    return crypto.createHash('sha256').update(chainString).digest('hex');
+  }
+
+  createChainBackup(chainFile) {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupDir = path.join(this.dataDir, 'chain-backups');
+    
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { mode: 0o700 });
+    }
+    
+    const backupFile = path.join(backupDir, `chain-backup-${timestamp}.json`);
+    fs.copyFileSync(chainFile, backupFile);
+  }
+
+  loadChain() {
+    const chainFile = path.join(this.dataDir, 'secure-blockchain.json');
+    
+    if (fs.existsSync(chainFile)) {
+      try {
+        const chainData = JSON.parse(fs.readFileSync(chainFile, 'utf8'));
+        
+        // Verify checksum
+        if (chainData.checksum) {
+          const expectedChecksum = crypto.createHash('sha256')
+            .update(JSON.stringify(chainData.chain))
+            .digest('hex');
+            
+          if (expectedChecksum !== chainData.checksum) {
+            throw new Error('Chain checksum verification failed');
+          }
+        }
+        
+        this.chain = chainData.chain || [];
+        this.difficulty = chainData.difficulty || this.difficulty;
+        this.miningReward = chainData.miningReward || this.miningReward;
+        this.pendingTransactions = chainData.pendingTransactions || [];
+        
+        console.log('✅ Secure blockchain loaded and verified');
+      } catch (error) {
+        console.log('⚠️ Error loading blockchain, starting fresh:', error.message);
+        this.chain = [];
+      }
+    }
+  }
+}
+
+module.exports = {
+  SecureGlitchnut,
+  SecureTransaction,
+  SecureWallet,
+  SecureBlock,
+  SECURITY_CONFIG
+};

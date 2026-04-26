@@ -1,0 +1,266 @@
+// Network Security for Glitchnut
+const crypto = require('crypto');
+const https = require('https');
+const fs = require('fs');
+
+class SecureNetworkNode {
+  constructor(options = {}) {
+    this.nodeId = this.generateNodeId();
+    this.peers = new Map();
+    this.blacklistedIPs = new Set();
+    this.rateLimiter = new Map();
+    this.maxConnections = options.maxConnections || 50;
+    this.connectionTimeout = options.connectionTimeout || 30000;
+  }
+
+  generateNodeId() {
+    return crypto.randomBytes(32).toString('hex');
+  }
+
+  // Rate limiting to prevent spam/DDoS
+  checkRateLimit(ip, endpoint) {
+    const key = `${ip}:${endpoint}`;
+    const now = Date.now();
+    const windowMs = 60000; // 1 minute window
+    const maxRequests = 100; // Max requests per window
+
+    if (!this.rateLimiter.has(key)) {
+      this.rateLimiter.set(key, { count: 1, resetTime: now + windowMs });
+      return true;
+    }
+
+    const limit = this.rateLimiter.get(key);
+    if (now > limit.resetTime) {
+      limit.count = 1;
+      limit.resetTime = now + windowMs;
+      return true;
+    }
+
+    if (limit.count >= maxRequests) {
+      console.log(`⚠️ Rate limit exceeded for ${ip} on ${endpoint}`);
+      return false;
+    }
+
+    limit.count++;
+    return true;
+  }
+
+  // Validate incoming messages
+  validateMessage(message, sender) {
+    try {
+      // Check message structure
+      if (!message.type || !message.timestamp || !message.signature) {
+        throw new Error('Invalid message structure');
+      }
+
+      // Check timestamp (prevent replay attacks)
+      const maxAge = 5 * 60 * 1000; // 5 minutes
+      if (Date.now() - message.timestamp > maxAge) {
+        throw new Error('Message too old');
+      }
+
+      // Verify signature
+      if (!this.verifyMessageSignature(message, sender)) {
+        throw new Error('Invalid signature');
+      }
+
+      return true;
+    } catch (error) {
+      console.log(`❌ Message validation failed: ${error.message}`);
+      return false;
+    }
+  }
+
+  verifyMessageSignature(message, senderPublicKey) {
+    const messageData = JSON.stringify({
+      type: message.type,
+      data: message.data,
+      timestamp: message.timestamp
+    });
+    
+    const hash = crypto.createHash('sha256').update(messageData).digest('hex');
+    
+    try {
+      const verify = crypto.createVerify('SHA256');
+      verify.update(hash);
+      return verify.verify(senderPublicKey, message.signature, 'hex');
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Secure peer discovery with reputation system
+  addPeer(peerInfo) {
+    if (this.peers.size >= this.maxConnections) {
+      console.log('❌ Max connections reached');
+      return false;
+    }
+
+    if (this.blacklistedIPs.has(peerInfo.ip)) {
+      console.log(`❌ IP ${peerInfo.ip} is blacklisted`);
+      return false;
+    }
+
+    // Initialize peer with reputation score
+    const peer = {
+      ...peerInfo,
+      reputation: 100, // Start with neutral reputation
+      lastSeen: Date.now(),
+      messageCount: 0,
+      invalidMessages: 0
+    };
+
+    this.peers.set(peerInfo.id, peer);
+    console.log(`✅ Added peer: ${peerInfo.id}`);
+    return true;
+  }
+
+  // Update peer reputation based on behavior
+  updatePeerReputation(peerId, action) {
+    const peer = this.peers.get(peerId);
+    if (!peer) return;
+
+    switch (action) {
+      case 'valid_block':
+        peer.reputation += 10;
+        break;
+      case 'invalid_block':
+        peer.reputation -= 20;
+        peer.invalidMessages++;
+        break;
+      case 'valid_transaction':
+        peer.reputation += 5;
+        break;
+      case 'invalid_transaction':
+        peer.reputation -= 10;
+        peer.invalidMessages++;
+        break;
+      case 'spam':
+        peer.reputation -= 50;
+        break;
+    }
+
+    // Remove peers with bad reputation
+    if (peer.reputation < 0 || peer.invalidMessages > 10) {
+      console.log(`❌ Removing peer ${peerId} due to bad reputation`);
+      this.blacklistedIPs.add(peer.ip);
+      this.peers.delete(peerId);
+    }
+  }
+
+  // Secure message broadcasting
+  broadcastMessage(message, excludePeerId = null) {
+    const validPeers = Array.from(this.peers.values())
+      .filter(peer => peer.id !== excludePeerId && peer.reputation > 50)
+      .sort((a, b) => b.reputation - a.reputation)
+      .slice(0, 20); // Only broadcast to top 20 peers
+
+    validPeers.forEach(peer => {
+      this.sendMessageToPeer(peer, message);
+    });
+  }
+
+  sendMessageToPeer(peer, message) {
+    // In real implementation, use secure WebSocket or TCP connection
+    console.log(`📤 Sending message to peer ${peer.id}`);
+  }
+
+  // Clean up old rate limit entries
+  cleanupRateLimiter() {
+    const now = Date.now();
+    for (const [key, limit] of this.rateLimiter.entries()) {
+      if (now > limit.resetTime) {
+        this.rateLimiter.delete(key);
+      }
+    }
+  }
+}
+
+// TLS/SSL Configuration for HTTPS API
+class SecureAPIServer {
+  constructor(blockchain, options = {}) {
+    this.blockchain = blockchain;
+    this.port = options.port || 3443; // Use HTTPS port
+    this.certPath = options.certPath || './certs/cert.pem';
+    this.keyPath = options.keyPath || './certs/key.pem';
+  }
+
+  generateSelfSignedCert() {
+    // Generate self-signed certificate for development
+    const { exec } = require('child_process');
+    
+    if (!fs.existsSync('./certs')) {
+      fs.mkdirSync('./certs', { mode: 0o700 });
+    }
+
+    const cmd = `openssl req -x509 -newkey rsa:4096 -keyout ./certs/key.pem -out ./certs/cert.pem -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Glitchnut/CN=localhost"`;
+    
+    exec(cmd, (error) => {
+      if (error) {
+        console.log('❌ Failed to generate certificate:', error.message);
+        console.log('📝 Please generate SSL certificates manually');
+      } else {
+        console.log('✅ Generated self-signed certificate');
+      }
+    });
+  }
+
+  startSecureServer() {
+    // Check if certificates exist
+    if (!fs.existsSync(this.certPath) || !fs.existsSync(this.keyPath)) {
+      console.log('📜 SSL certificates not found, generating...');
+      this.generateSelfSignedCert();
+      return;
+    }
+
+    const express = require('express');
+    const helmet = require('helmet'); // Security middleware
+    
+    const app = express();
+
+    // Security middleware
+    app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", "data:", "https:"],
+        },
+      },
+    }));
+
+    // Rate limiting
+    const rateLimit = require('express-rate-limit');
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // limit each IP to 100 requests per windowMs
+      message: 'Too many requests from this IP'
+    });
+    app.use('/api/', limiter);
+
+    // Body parsing with size limits
+    app.use(express.json({ limit: '10mb' }));
+    app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+    // SSL certificate and key
+    const options = {
+      key: fs.readFileSync(this.keyPath),
+      cert: fs.readFileSync(this.certPath)
+    };
+
+    // Create HTTPS server
+    const server = https.createServer(options, app);
+
+    server.listen(this.port, () => {
+      console.log(`🔒 Secure API server running on https://localhost:${this.port}`);
+    });
+
+    return server;
+  }
+}
+
+module.exports = {
+  SecureNetworkNode,
+  SecureAPIServer
+};

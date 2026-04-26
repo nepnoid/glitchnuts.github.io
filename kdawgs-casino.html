@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎰 K-DAWGS Casino - Play • Win • Earn GNC</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #000;
+            color: #00ff41;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Matrix Rain Background */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(0,255,65,0.1), rgba(0,255,255,0.1));
+            border-bottom: 2px solid #00ff41;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                rgba(0,255,65,0.05) 2px,
+                rgba(0,255,65,0.05) 4px
+            );
+            animation: scan 4s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: 900;
+            text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #00ffff;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .balance-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+        
+        .games-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .game-card {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,50,0,0.3));
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0,255,65,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,65,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .game-card:hover::before {
+            left: 100%;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,255,65,0.4);
+            border-color: #00ffff;
+        }
+        
+        .featured-game {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(0,255,65,0.1));
+            border-color: #ffd700;
+            box-shadow: 0 0 30px rgba(255,215,0,0.3);
+        }
+        
+        .game-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px currentColor;
+        }
+        
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #00ffff;
+        }
+        
+        .game-description {
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+        
+        .play-button {
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+        }
+        
+        .play-button:hover {
+            background: linear-gradient(45deg, #00ffff, #00ff41);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,255,65,0.5);
+        }
+        
+        .bet-input {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-family: 'Orbitron', monospace;
+            margin: 0.25rem;
+            width: 80px;
+        }
+        
+        .game-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .game-result.win {
+            background: rgba(0,255,0,0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .game-result.lose {
+            background: rgba(255,0,0,0.2);
+            border: 2px solid #ff0000;
+            color: #ff0000;
+        }
+        
+        /* Keno Styles */
+        .keno-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+            max-width: 400px;
+        }
+        
+        .keno-number {
+            aspect-ratio: 1;
+            border: 2px solid #00ff41;
+            background: rgba(0,0,0,0.8);
+            color: #00ff41;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        
+        .keno-number:hover {
+            background: rgba(0,255,65,0.2);
+            transform: scale(1.1);
+        }
+        
+        .keno-number.selected {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 15px #00ff41;
+        }
+        
+        .keno-number.drawn {
+            background: #ffff00;
+            color: #000;
+            border-color: #ffff00;
+            box-shadow: 0 0 15px #ffff00;
+            animation: pulse 1s ease-in-out;
+        }
+        
+        .keno-number.match {
+            background: #00ff00;
+            color: #000;
+            border-color: #00ff00;
+            box-shadow: 0 0 20px #00ff00;
+            animation: match 1s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes match {
+            0%, 100% { transform: scale(1); }
+            25%, 75% { transform: scale(1.3); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .keno-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .keno-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+
+        
+        /* Blackjack Styles */
+        .blackjack-game {
+            margin: 20px 0;
+        }
+        
+        .blackjack-table {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .dealer-section, .player-section {
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .dealer-section h4, .player-section h4 {
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        
+        .dealer-cards, .player-cards {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        
+        .card {
+            width: 60px;
+            height: 80px;
+            background: rgba(255,255,255,0.9);
+            color: #000;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 0 10px rgba(0,255,65,0.3);
+        }
+        
+        .card.hidden {
+            background: #333;
+            color: #00ff41;
+        }
+        
+        .dealer-total, .player-total {
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+        
+        .blackjack-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .blackjack-controls button {
+            margin: 0 5px;
+        }
+        
+        /* Roulette Styles */
+        .roulette-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .roulette-wheel {
+            width: 200px;
+            height: 200px;
+            border: 5px solid #00ff41;
+            border-radius: 50%;
+            margin: 20px auto;
+            background: conic-gradient(
+                #ff0000 0deg 18deg,
+                #000000 18deg 36deg,
+                #ff0000 36deg 54deg,
+                #000000 54deg 72deg,
+                #ff0000 72deg 90deg,
+                #000000 90deg 108deg,
+                #ff0000 108deg 126deg,
+                #000000 126deg 144deg,
+                #ff0000 144deg 162deg,
+                #000000 162deg 180deg,
+                #ff0000 180deg 198deg,
+                #000000 198deg 216deg,
+                #ff0000 216deg 234deg,
+                #000000 234deg 252deg,
+                #ff0000 252deg 270deg,
+                #000000 270deg 288deg,
+                #ff0000 288deg 306deg,
+                #000000 306deg 324deg,
+                #ff0000 324deg 342deg,
+                #000000 342deg 360deg
+            );
+            position: relative;
+            transition: transform 3s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff41;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px #000;
+        }
+        
+        .roulette-bets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .bet-option {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .bet-option:hover {
+            background: rgba(0,255,65,0.2);
+            transform: scale(1.05);
+        }
+        
+        .bet-option.selected {
+            background: #00ff41;
+            color: #000;
+        }
+        
+        /* Scratch Card Styles */
+        .scratch-card {
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+            position: relative;
+            border: 3px solid #00ff41;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #ffd700, #ffff00);
+            cursor: crosshair;
+        }
+        
+        .scratch-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #666;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .scratch-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 12px;
+        }
+        
+        /* Poker Styles */
+        .poker-hand {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .poker-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .hold-button {
+            background: rgba(255,255,0,0.2);
+            border: 2px solid #ffff00;
+            color: #ffff00;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        .hold-button.held {
+            background: #ffff00;
+            color: #000;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar-panel {
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,50,0,0.3));
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0,255,65,0.2);
+        }
+        
+        .panel-title {
+            color: #00ffff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-shadow: 0 0 10px #00ffff;
+        }
+        
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background: rgba(0,255,65,0.1);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .chat-container {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+        }
+        
+        .chat-input button {
+            background: #00ff41;
+            color: #000;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+        }
+        
+        .vote-container {
+            text-align: center;
+        }
+        
+        .vote-option {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 0.5rem;
+            margin: 0.25rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .vote-option:hover {
+            background: rgba(0,255,65,0.2);
+        }
+        
+        .vote-option.voted {
+            background: #00ff41;
+            color: #000;
+        }
+        
+        /* Wallet Styles */
+        .wallet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .wallet-balance {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .crypto-balance {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(0,255,65,0.05);
+            border-radius: 5px;
+        }
+        
+        .crypto-name {
+            font-weight: bold;
+            color: #00ffff;
+            font-size: 0.9rem;
+        }
+        
+        .crypto-amount {
+            color: #00ff41;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .wallet-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .wallet-btn {
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            color: #000;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 5px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .wallet-btn:hover {
+            background: linear-gradient(45deg, #00ffff, #00ff41);
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0,255,65,0.5);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                display: grid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .games-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .keno-board {
+                grid-template-columns: repeat(8, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    
+    <div class="header">
+        <h1 class="title">🎰 K-DAWGS CASINO 🎰</h1>
+        <p class="subtitle">🐕 THE ULTIMATE KENO EXPERIENCE 🐕</p>
+        <div class="balance-display" id="balance">💰 Balance: <span id="balanceAmount">2500</span> GNC</div>
+    </div>
+
+    <div class="main-container">
+        <div class="games-container">
+            <!-- Featured K-DAWGS Keno -->
+            <div class="game-card featured-game">
+                <span class="game-icon">🐕</span>
+                <h3 class="game-title">K-DAWGS KENO</h3>
+                <p class="game-description">🔥 The LEGENDARY game that started it all! Pick your lucky numbers and hack the matrix for massive wins! 🔥</p>
+                
+                <div class="keno-info">
+                    <span>Selected: <span id="selectedCount">0</span>/10</span>
+                    <span>Matches: <span id="matchCount">0</span></span>
+                </div>
+                
+                <div class="keno-board" id="kenoBoard"></div>
+                
+                <div class="keno-controls">
+                    <input type="number" class="bet-input" id="kenoBet" placeholder="Bet" value="50">
+                    <button class="play-button" onclick="playKeno()">🎯 HACK THE MATRIX</button>
+                    <button class="play-button" onclick="clearKenoSelection()">🔄 CLEAR</button>
+                </div>
+                
+                <div class="game-result" id="kenoResult"></div>
+            </div>
+
+
+
+            <!-- Matrix Blackjack -->
+            <div class="game-card">
+                <span class="game-icon">🃏</span>
+                <h3 class="game-title">Matrix Blackjack</h3>
+                <p class="game-description">Beat the AI dealer! Get as close to 21 as possible without going over in this cyberpunk 21.</p>
+                <div class="blackjack-game">
+                    <div class="blackjack-table">
+                        <div class="dealer-section">
+                            <h4>🤖 DEALER.AI</h4>
+                            <div class="dealer-cards" id="dealerCards">
+                                <div class="card">?</div>
+                            </div>
+                            <div class="dealer-total" id="dealerTotal">Total: ?</div>
+                        </div>
+                        
+                        <div class="player-section">
+                            <h4>👤 PLAYER</h4>
+                            <div class="player-cards" id="playerCards">
+                                <div class="card">?</div>
+                            </div>
+                            <div class="player-total" id="playerTotal">Total: 0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="blackjack-controls">
+                        <input type="number" class="bet-input" id="blackjackBet" placeholder="Bet" value="25">
+                        <button class="play-button" onclick="startBlackjack()">🎴 DEAL CARDS</button>
+                        <button class="play-button" onclick="hit()" id="hitBtn" style="display:none;">📈 HIT</button>
+                        <button class="play-button" onclick="stand()" id="standBtn" style="display:none;">✋ STAND</button>
+                    </div>
+                    
+                    <div class="game-result" id="blackjackResult"></div>
+                </div>
+            </div>
+
+            <!-- Matrix Roulette -->
+            <div class="game-card">
+                <span class="game-icon">🎡</span>
+                <h3 class="game-title">Matrix Roulette</h3>
+                <p class="game-description">Spin the cyber wheel! Choose your numbers and watch the matrix decide your fate.</p>
+                
+                <div class="roulette-container">
+                    <div class="roulette-wheel" id="rouletteWheel">
+                        <span id="rouletteResult">SPIN</span>
+                    </div>
+                    
+                    <div class="roulette-bets">
+                        <div class="bet-option" onclick="selectRouletteBet(this, 'red')">RED</div>
+                        <div class="bet-option" onclick="selectRouletteBet(this, 'black')">BLACK</div>
+                        <div class="bet-option" onclick="selectRouletteBet(this, 'even')">EVEN</div>
+                        <div class="bet-option" onclick="selectRouletteBet(this, 'odd')">ODD</div>
+                        <div class="bet-option" onclick="selectRouletteBet(this, 'low')">1-18</div>
+                        <div class="bet-option" onclick="selectRouletteBet(this, 'high')">19-36</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <input type="number" class="bet-input" id="rouletteBet" placeholder="Bet" value="25">
+                        <button class="play-button" onclick="spinRoulette()">🎡 SPIN WHEEL</button>
+                    </div>
+                    
+                    <div class="game-result" id="rouletteGameResult"></div>
+                </div>
+            </div>
+
+            <!-- Scratch Card -->
+            <div class="game-card">
+                <span class="game-icon">🎫</span>
+                <h3 class="game-title">Matrix Scratch Card</h3>
+                <p class="game-description">Scratch away the digital coating to reveal hidden prizes! Click and drag to scratch.</p>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <input type="number" class="bet-input" id="scratchBet" placeholder="Bet" value="25">
+                    <button class="play-button" onclick="newScratchCard()">🎫 NEW CARD</button>
+                </div>
+                
+                <div class="scratch-card" id="scratchCard">
+                    <div class="scratch-content" id="scratchContent">
+                        🎰 BUY A CARD TO PLAY 🎰
+                    </div>
+                    <canvas class="scratch-surface" id="scratchCanvas" width="300" height="200"></canvas>
+                </div>
+                
+                <div class="game-result" id="scratchResult"></div>
+            </div>
+
+            <!-- Joker Poker -->
+            <div class="game-card">
+                <span class="game-icon">🃏</span>
+                <h3 class="game-title">Joker Poker</h3>
+                <p class="game-description">5-card draw poker with jokers wild! Hold your best cards and draw for winning hands.</p>
+                
+                <div class="poker-hand" id="pokerHand">
+                    <div style="text-align: center;">
+                        <div class="card">?</div>
+                        <div class="hold-button" onclick="toggleHold(0)">HOLD</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="card">?</div>
+                        <div class="hold-button" onclick="toggleHold(1)">HOLD</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="card">?</div>
+                        <div class="hold-button" onclick="toggleHold(2)">HOLD</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="card">?</div>
+                        <div class="hold-button" onclick="toggleHold(3)">HOLD</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="card">?</div>
+                        <div class="hold-button" onclick="toggleHold(4)">HOLD</div>
+                    </div>
+                </div>
+                
+                <div class="poker-controls">
+                    <input type="number" class="bet-input" id="pokerBet" placeholder="Bet" value="25">
+                    <button class="play-button" onclick="dealPoker()">🎴 DEAL</button>
+                    <button class="play-button" onclick="drawPoker()" id="drawBtn" style="display:none;">🔄 DRAW</button>
+                </div>
+                
+                <div class="game-result" id="pokerResult"></div>
+            </div>
+
+            <!-- Crash Game -->
+            <div class="game-card">
+                <span class="game-icon">📈</span>
+                <h3 class="game-title">Matrix Crash</h3>
+                <p class="game-description">Watch the multiplier rise! Cash out before the matrix crashes or lose it all!</p>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 3rem; margin: 20px 0; color: #00ffff;" id="crashMultiplier">1.00x</div>
+                    <div style="margin: 20px 0;">
+                        <input type="number" class="bet-input" id="crashBet" placeholder="Bet" value="25">
+                        <button class="play-button" onclick="startCrash()" id="crashStartBtn">🚀 START</button>
+                        <button class="play-button" onclick="cashOut()" id="cashOutBtn" style="display:none;">💰 CASH OUT</button>
+                    </div>
+                </div>
+                
+                <div class="game-result" id="crashResult"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <!-- Top Players -->
+            <div class="sidebar-panel">
+                <h3 class="panel-title">🏆 TOP PLAYERS</h3>
+                <div id="leaderboard">
+                    <div class="leaderboard-entry">
+                        <span>🥇 CRYPTO_KING</span>
+                        <span>15,750 GNC</span>
+                    </div>
+                    <div class="leaderboard-entry">
+                        <span>🥈 DIAMOND_HANDS</span>
+                        <span>12,300 GNC</span>
+                    </div>
+                    <div class="leaderboard-entry">
+                        <span>🥉 KENO_MASTER</span>
+                        <span>9,850 GNC</span>
+                    </div>
+                    <div class="leaderboard-entry">
+                        <span>4️⃣ HIGH_ROLLER</span>
+                        <span>7,200 GNC</span>
+                    </div>
+                    <div class="leaderboard-entry">
+                        <span>5️⃣ LUCKY_PLAYER</span>
+                        <span>5,500 GNC</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crypto Wallet -->
+            <div class="sidebar-panel">
+                <h3 class="panel-title">💰 CRYPTO WALLET</h3>
+                <div class="wallet-container">
+                    <div class="wallet-balance">
+                        <div class="crypto-balance">
+                            <span class="crypto-name">🎰 GNC</span>
+                            <span class="crypto-amount" id="walletGNC">2,500</span>
+                        </div>
+                        <div class="crypto-balance">
+                            <span class="crypto-name">₿ BTC</span>
+                            <span class="crypto-amount">0.0432</span>
+                        </div>
+                        <div class="crypto-balance">
+                            <span class="crypto-name">Ξ ETH</span>
+                            <span class="crypto-amount">1.247</span>
+                        </div>
+                        <div class="crypto-balance">
+                            <span class="crypto-name">◉ DOGE</span>
+                            <span class="crypto-amount">15,420</span>
+                        </div>
+                    </div>
+                    <div class="wallet-actions">
+                        <button class="wallet-btn" onclick="connectWallet()">🔗 CONNECT</button>
+                        <button class="wallet-btn" onclick="depositFunds()">💳 DEPOSIT</button>
+                        <button class="wallet-btn" onclick="withdrawFunds()">💸 WITHDRAW</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat -->
+            <div class="sidebar-panel">
+                <h3 class="panel-title">💬 CASINO CHAT</h3>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div style="color: #00ffff; margin-bottom: 5px;">
+                            <span style="color: #ffff00;">[CRYPTO_KING]</span> Just hit 5 numbers on K-DAWGS KENO! 🔥
+                        </div>
+                        <div style="color: #00ffff; margin-bottom: 5px;">
+                            <span style="color: #ffff00;">[DIAMOND_HANDS]</span> Roulette is on fire today! 🎡
+                        </div>
+                        <div style="color: #00ffff; margin-bottom: 5px;">
+                            <span style="color: #ffff00;">[KENO_MASTER]</span> Welcome to the casino! 🎰
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type message..." maxlength="100">
+                        <button onclick="sendChatMessage()">SEND</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vote for New Games -->
+            <div class="sidebar-panel">
+                <h3 class="panel-title">🗳️ VOTE NEW GAME</h3>
+                <div class="vote-container">
+                    <div class="vote-option" onclick="voteGame(this, 'baccarat')">
+                        🎯 Baccarat
+                        <div style="font-size: 0.7rem; color: #00ffff;">3 votes</div>
+                    </div>
+                    <div class="vote-option" onclick="voteGame(this, 'texas')">
+                        ♠️ Texas Hold'em
+                        <div style="font-size: 0.7rem; color: #00ffff;">7 votes</div>
+                    </div>
+                    <div class="vote-option" onclick="voteGame(this, 'craps')">
+                        🎲 Craps Table
+                        <div style="font-size: 0.7rem; color: #00ffff;">2 votes</div>
+                    </div>
+                    <div class="vote-option" onclick="voteGame(this, 'mines')">
+                        💎 Crypto Mines
+                        <div style="font-size: 0.7rem; color: #00ffff;">12 votes</div>
+                    </div>
+                    <div class="vote-option" onclick="voteGame(this, 'wheel')">
+                        🎪 Wheel of Fortune
+                        <div style="font-size: 0.7rem; color: #00ffff;">5 votes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Variables
+        let playerBalance = 2500;
+        let selectedKenoNumbers = [];
+        let gameStats = {
+            totalGames: 0,
+            totalWinnings: 0
+        };
+
+        // Initialize Matrix Background
+        function initMatrix() {
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            const columns = canvas.width / 20;
+            const drops = Array(Math.floor(columns)).fill(0);
+            
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00ff41';
+                ctx.font = '20px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = characters[Math.floor(Math.random() * characters.length)];
+                    ctx.fillText(text, i * 20, drops[i] * 20);
+                    
+                    if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(drawMatrix, 50);
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // Initialize Keno Board
+        function initKenoBoard() {
+            const board = document.getElementById('kenoBoard');
+            for (let i = 1; i <= 80; i++) {
+                const number = document.createElement('div');
+                number.className = 'keno-number';
+                number.textContent = i;
+                number.onclick = () => toggleKenoNumber(i);
+                board.appendChild(number);
+            }
+        }
+
+        // Keno Game Functions
+        function toggleKenoNumber(num) {
+            const numberElement = document.querySelector(`.keno-number:nth-child(${num})`);
+            
+            if (selectedKenoNumbers.includes(num)) {
+                selectedKenoNumbers = selectedKenoNumbers.filter(n => n !== num);
+                numberElement.classList.remove('selected');
+            } else if (selectedKenoNumbers.length < 10) {
+                selectedKenoNumbers.push(num);
+                numberElement.classList.add('selected');
+            }
+            
+            document.getElementById('selectedCount').textContent = selectedKenoNumbers.length;
+        }
+
+        function clearKenoSelection() {
+            selectedKenoNumbers = [];
+            document.querySelectorAll('.keno-number').forEach(num => {
+                num.classList.remove('selected', 'drawn', 'match');
+            });
+            document.getElementById('selectedCount').textContent = '0';
+            document.getElementById('matchCount').textContent = '0';
+        }
+
+        function playKeno() {
+            if (selectedKenoNumbers.length === 0) {
+                alert('🐕 Select some K-DAWGS numbers first!');
+                return;
+            }
+            
+            const bet = parseInt(document.getElementById('kenoBet').value) || 50;
+            
+            if (bet > playerBalance) {
+                alert('⚠️ INSUFFICIENT K-DAWGS FUNDS!');
+                return;
+            }
+            
+            playerBalance -= bet;
+            gameStats.totalGames++;
+            
+            // Clear previous results
+            document.querySelectorAll('.keno-number').forEach(num => {
+                num.classList.remove('drawn', 'match');
+            });
+            
+            // Draw 20 numbers
+            const drawnNumbers = [];
+            while (drawnNumbers.length < 20) {
+                const num = Math.floor(Math.random() * 80) + 1;
+                if (!drawnNumbers.includes(num)) {
+                    drawnNumbers.push(num);
+                }
+            }
+            
+            // Animate drawing with delay
+            drawnNumbers.forEach((num, index) => {
+                setTimeout(() => {
+                    const numberElement = document.querySelector(`.keno-number:nth-child(${num})`);
+                    numberElement.classList.add('drawn');
+                    
+                    if (selectedKenoNumbers.includes(num)) {
+                        numberElement.classList.add('match');
+                    }
+                    
+                    // After all numbers drawn, calculate result
+                    if (index === drawnNumbers.length - 1) {
+                        setTimeout(() => calculateKenoResult(bet, drawnNumbers), 500);
+                    }
+                }, index * 100);
+            });
+        }
+
+        function calculateKenoResult(bet, drawnNumbers) {
+            const matches = selectedKenoNumbers.filter(num => drawnNumbers.includes(num));
+            const matchCount = matches.length;
+            
+            document.getElementById('matchCount').textContent = matchCount;
+            
+            // K-DAWGS KENO improved payout table (better odds)
+            const payouts = {
+                1: { 1: 3 },
+                2: { 1: 1, 2: 9 },
+                3: { 2: 1, 3: 43 },
+                4: { 2: 1, 3: 4, 4: 108 },
+                5: { 3: 1, 4: 9, 5: 810 },
+                6: { 3: 1, 4: 2, 5: 90, 6: 1600 },
+                7: { 3: 1, 4: 1, 5: 21, 6: 400, 7: 7000 },
+                8: { 4: 1, 5: 9, 6: 98, 7: 1652, 8: 10000 },
+                9: { 4: 1, 5: 4, 6: 44, 7: 335, 8: 4700, 9: 10000 },
+                10: { 5: 2, 6: 24, 7: 142, 8: 1000, 9: 4500, 10: 10000 }
+            };
+            
+            const selectedCount = selectedKenoNumbers.length;
+            const payout = payouts[selectedCount] && payouts[selectedCount][matchCount] ? payouts[selectedCount][matchCount] : 0;
+            
+            const resultDiv = document.getElementById('kenoResult');
+            
+            if (payout > 0) {
+                const winnings = bet * payout;
+                playerBalance += winnings;
+                gameStats.totalWinnings += winnings;
+                resultDiv.className = 'game-result win';
+                resultDiv.textContent = `🐕 K-DAWGS JACKPOT! ${matchCount} matches = ${winnings} GNC! 🐕`;
+            } else {
+                resultDiv.className = 'game-result lose';
+                resultDiv.textContent = `💸 No luck this time! ${matchCount} matches. Try again! 💸`;
+            }
+            
+            resultDiv.style.display = 'block';
+            updateBalance();
+        }
+
+
+
+        // Blackjack Game Variables
+        let deck = [];
+        let playerHand = [];
+        let dealerHand = [];
+        let gameInProgress = false;
+        
+        // Create a deck of cards
+        function createDeck() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            deck = [];
+            
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value });
+                }
+            }
+            
+            // Shuffle deck
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+        
+        // Deal a card
+        function dealCard() {
+            return deck.pop();
+        }
+        
+        // Calculate hand value
+        function calculateHandValue(hand) {
+            let value = 0;
+            let aces = 0;
+            
+            for (let card of hand) {
+                if (card.value === 'A') {
+                    aces++;
+                    value += 11;
+                } else if (['J', 'Q', 'K'].includes(card.value)) {
+                    value += 10;
+                } else {
+                    value += parseInt(card.value);
+                }
+            }
+            
+            // Adjust for aces
+            while (value > 21 && aces > 0) {
+                value -= 10;
+                aces--;
+            }
+            
+            return value;
+        }
+        
+        // Display cards
+        function displayCards(hand, containerId, hideFirst = false) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            hand.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                
+                if (hideFirst && index === 0) {
+                    cardElement.className += ' hidden';
+                    cardElement.textContent = '?';
+                } else {
+                    cardElement.textContent = `${card.value}${card.suit}`;
+                }
+                
+                container.appendChild(cardElement);
+            });
+        }
+        
+        // Start new blackjack game
+        function startBlackjack() {
+            const bet = parseInt(document.getElementById('blackjackBet').value) || 25;
+            
+            if (bet > playerBalance) {
+                alert('⚠️ INSUFFICIENT FUNDS!');
+                return;
+            }
+            
+            if (gameInProgress) {
+                alert('⚠️ GAME IN PROGRESS!');
+                return;
+            }
+            
+            playerBalance -= bet;
+            gameStats.totalGames++;
+            gameInProgress = true;
+            
+            // Reset hands
+            createDeck();
+            playerHand = [];
+            dealerHand = [];
+            
+            // Deal initial cards
+            playerHand.push(dealCard());
+            dealerHand.push(dealCard());
+            playerHand.push(dealCard());
+            dealerHand.push(dealCard());
+            
+            // Display cards
+            displayCards(playerHand, 'playerCards');
+            displayCards(dealerHand, 'dealerCards', true);
+            
+            // Update totals
+            document.getElementById('playerTotal').textContent = `Total: ${calculateHandValue(playerHand)}`;
+            document.getElementById('dealerTotal').textContent = 'Total: ?';
+            
+            // Show game buttons
+            document.getElementById('hitBtn').style.display = 'inline-block';
+            document.getElementById('standBtn').style.display = 'inline-block';
+            document.getElementById('blackjackResult').style.display = 'none';
+            
+            // Check for immediate blackjack
+            if (calculateHandValue(playerHand) === 21) {
+                stand();
+            }
+            
+            updateBalance();
+        }
+        
+        // Player hits
+        function hit() {
+            if (!gameInProgress) return;
+            
+            playerHand.push(dealCard());
+            displayCards(playerHand, 'playerCards');
+            
+            const playerValue = calculateHandValue(playerHand);
+            document.getElementById('playerTotal').textContent = `Total: ${playerValue}`;
+            
+            if (playerValue > 21) {
+                // Player busts
+                endGame('BUST! YOU LOSE!', false);
+            } else if (playerValue === 21) {
+                // Player has 21, auto-stand
+                stand();
+            }
+        }
+        
+        // Player stands
+        function stand() {
+            if (!gameInProgress) return;
+            
+            // Reveal dealer's hidden card
+            displayCards(dealerHand, 'dealerCards');
+            let dealerValue = calculateHandValue(dealerHand);
+            document.getElementById('dealerTotal').textContent = `Total: ${dealerValue}`;
+            
+            // Dealer hits until 17 or higher
+            while (dealerValue < 17) {
+                dealerHand.push(dealCard());
+                displayCards(dealerHand, 'dealerCards');
+                dealerValue = calculateHandValue(dealerHand);
+                document.getElementById('dealerTotal').textContent = `Total: ${dealerValue}`;
+            }
+            
+            // Determine winner
+            const playerValue = calculateHandValue(playerHand);
+            
+            if (dealerValue > 21) {
+                endGame('DEALER BUSTS! YOU WIN!', true);
+            } else if (playerValue > dealerValue) {
+                endGame('YOU WIN!', true);
+            } else if (dealerValue > playerValue) {
+                endGame('DEALER WINS!', false);
+            } else {
+                endGame('PUSH! TIE GAME!', 'tie');
+            }
+        }
+        
+        // End the game
+        function endGame(message, playerWon) {
+            gameInProgress = false;
+            const bet = parseInt(document.getElementById('blackjackBet').value) || 25;
+            const resultDiv = document.getElementById('blackjackResult');
+            
+            if (playerWon === true) {
+                const winnings = bet * 2;
+                playerBalance += winnings;
+                gameStats.totalWinnings += winnings;
+                resultDiv.className = 'game-result win';
+                resultDiv.textContent = `🎉 ${message} WON ${winnings} GNC! 🎉`;
+            } else if (playerWon === 'tie') {
+                playerBalance += bet; // Return bet
+                resultDiv.className = 'game-result';
+                resultDiv.style.background = 'rgba(255,255,0,0.2)';
+                resultDiv.style.borderColor = '#ffff00';
+                resultDiv.style.color = '#ffff00';
+                resultDiv.textContent = `🤝 ${message} BET RETURNED!`;
+            } else {
+                resultDiv.className = 'game-result lose';
+                resultDiv.textContent = `💸 ${message} LOST ${bet} GNC!`;
+            }
+            
+            resultDiv.style.display = 'block';
+            
+            // Hide game buttons
+            document.getElementById('hitBtn').style.display = 'none';
+            document.getElementById('standBtn').style.display = 'none';
+            
+            updateBalance();
+        }
+
+        // Roulette Game Functions
+        let selectedRouletteBet = null;
+
+        function selectRouletteBet(element, betType) {
+            // Clear previous selection
+            document.querySelectorAll('.bet-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Select new bet
+            element.classList.add('selected');
+            selectedRouletteBet = betType;
+        }
+
+        function spinRoulette() {
+            if (!selectedRouletteBet) {
+                alert('🎡 Select a bet first!');
+                return;
+            }
+            
+            const bet = parseInt(document.getElementById('rouletteBet').value) || 25;
+            
+            if (bet > playerBalance) {
+                alert('⚠️ INSUFFICIENT FUNDS!');
+                return;
+            }
+            
+            playerBalance -= bet;
+            gameStats.totalGames++;
+            
+            // Generate random number (0-36, where 0 is green)
+            const winningNumber = Math.floor(Math.random() * 37);
+            const wheel = document.getElementById('rouletteWheel');
+            const result = document.getElementById('rouletteResult');
+            
+            // Spin animation
+            const spins = Math.random() * 1440 + 1440; // 4-8 full rotations
+            wheel.style.transform = `rotate(${spins}deg)`;
+            
+            setTimeout(() => {
+                result.textContent = winningNumber;
+                checkRouletteWin(bet, winningNumber);
+            }, 3000);
+        }
+
+        function checkRouletteWin(bet, winningNumber) {
+            const resultDiv = document.getElementById('rouletteGameResult');
+            let won = false;
+            let multiplier = 2;
+            
+            // Red numbers: 1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36
+            const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+            const isRed = redNumbers.includes(winningNumber);
+            const isBlack = winningNumber > 0 && !isRed;
+            const isEven = winningNumber > 0 && winningNumber % 2 === 0;
+            const isOdd = winningNumber > 0 && winningNumber % 2 === 1;
+            const isLow = winningNumber >= 1 && winningNumber <= 18;
+            const isHigh = winningNumber >= 19 && winningNumber <= 36;
+            
+            // Check win conditions
+            switch (selectedRouletteBet) {
+                case 'red':
+                    won = isRed;
+                    break;
+                case 'black':
+                    won = isBlack;
+                    break;
+                case 'even':
+                    won = isEven;
+                    break;
+                case 'odd':
+                    won = isOdd;
+                    break;
+                case 'low':
+                    won = isLow;
+                    break;
+                case 'high':
+                    won = isHigh;
+                    break;
+            }
+            
+            if (won) {
+                const winnings = bet * multiplier;
+                playerBalance += winnings;
+                gameStats.totalWinnings += winnings;
+                resultDiv.className = 'game-result win';
+                resultDiv.textContent = `🎡 ROULETTE WIN! Number ${winningNumber} = ${winnings} GNC! 🎡`;
+            } else {
+                resultDiv.className = 'game-result lose';
+                resultDiv.textContent = `💸 Number ${winningNumber} - Lost ${bet} GNC! 💸`;
+            }
+            
+            resultDiv.style.display = 'block';
+            selectedRouletteBet = null;
+            
+            // Clear selection
+            document.querySelectorAll('.bet-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            updateBalance();
+        }
+
+        // Scratch Card Functions
+        let scratchCardActive = false;
+        let scratchReward = 0;
+
+        function newScratchCard() {
+            const bet = parseInt(document.getElementById('scratchBet').value) || 25;
+            
+            if (bet > playerBalance) {
+                alert('⚠️ INSUFFICIENT FUNDS!');
+                return;
+            }
+            
+            playerBalance -= bet;
+            gameStats.totalGames++;
+            
+            // Generate random reward
+            const chance = Math.random();
+            if (chance < 0.4) { // 40% chance to win
+                scratchReward = Math.floor(bet * (1.5 + Math.random() * 8)); // 1.5x to 9.5x bet
+            } else {
+                scratchReward = 0;
+            }
+            
+            const canvas = document.getElementById('scratchCanvas');
+            const ctx = canvas.getContext('2d');
+            const content = document.getElementById('scratchContent');
+            
+            // Set up scratch surface
+            ctx.fillStyle = '#666';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#888';
+            ctx.font = 'bold 20px Orbitron';
+            ctx.textAlign = 'center';
+            ctx.fillText('SCRATCH TO REVEAL', canvas.width/2, canvas.height/2);
+            
+            // Set content
+            if (scratchReward > 0) {
+                content.innerHTML = `🎰 YOU WIN<br>${scratchReward} GNC! 🎰`;
+                content.style.color = '#00ff00';
+            } else {
+                content.innerHTML = `💸 BETTER LUCK<br>NEXT TIME! 💸`;
+                content.style.color = '#ff0000';
+            }
+            
+            scratchCardActive = true;
+            
+            // Add scratch functionality
+            setupScratchEvents(canvas, ctx);
+            
+            updateBalance();
+        }
+
+        function setupScratchEvents(canvas, ctx) {
+            let isScratching = false;
+            let scratchedArea = 0;
+            
+            function scratch(e) {
+                if (!scratchCardActive || !isScratching) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+                
+                scratchedArea++;
+                
+                // Check if enough area is scratched
+                if (scratchedArea > 50) {
+                    canvas.style.opacity = '0';
+                    
+                    if (scratchReward > 0) {
+                        playerBalance += scratchReward;
+                        gameStats.totalWinnings += scratchReward;
+                        showScratchResult(`🎫 SCRATCH WIN! ${scratchReward} GNC! 🎫`, true);
+                    } else {
+                        showScratchResult('💸 No prize this time! Try again! 💸', false);
+                    }
+                    
+                    scratchCardActive = false;
+                    updateBalance();
+                }
+            }
+            
+            canvas.addEventListener('mousedown', () => { isScratching = true; });
+            canvas.addEventListener('mouseup', () => { isScratching = false; });
+            canvas.addEventListener('mousemove', scratch);
+            canvas.addEventListener('touchstart', (e) => { 
+                e.preventDefault(); 
+                isScratching = true; 
+            });
+            canvas.addEventListener('touchend', () => { isScratching = false; });
+            canvas.addEventListener('touchmove', (e) => { 
+                e.preventDefault(); 
+                const touch = e.touches[0];
+                scratch(touch);
+            });
+        }
+
+        function showScratchResult(message, won) {
+            const resultDiv = document.getElementById('scratchResult');
+            resultDiv.className = won ? 'game-result win' : 'game-result lose';
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+        }
+
+        // Poker Functions
+        let pokerHand = [];
+        let heldCards = [false, false, false, false, false];
+        let pokerGameActive = false;
+
+        function dealPoker() {
+            const bet = parseInt(document.getElementById('pokerBet').value) || 25;
+            
+            if (bet > playerBalance) {
+                alert('⚠️ INSUFFICIENT FUNDS!');
+                return;
+            }
+            
+            playerBalance -= bet;
+            gameStats.totalGames++;
+            
+            // Create deck with jokers
+            createPokerDeck();
+            pokerHand = [];
+            heldCards = [false, false, false, false, false];
+            
+            // Deal 5 cards
+            for (let i = 0; i < 5; i++) {
+                pokerHand.push(dealCard());
+            }
+            
+            displayPokerHand();
+            resetHoldButtons();
+            
+            document.getElementById('drawBtn').style.display = 'inline-block';
+            document.getElementById('pokerResult').style.display = 'none';
+            
+            pokerGameActive = true;
+            updateBalance();
+        }
+
+        function createPokerDeck() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            deck = [];
+            
+            // Regular cards
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value });
+                }
+            }
+            
+            // Add 2 jokers
+            deck.push({ suit: '🃏', value: 'JOKER' });
+            deck.push({ suit: '🃏', value: 'JOKER' });
+            
+            // Shuffle deck
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function displayPokerHand() {
+            const handContainer = document.getElementById('pokerHand');
+            const cards = handContainer.querySelectorAll('.card');
+            
+            cards.forEach((card, index) => {
+                if (pokerHand[index]) {
+                    if (pokerHand[index].value === 'JOKER') {
+                        card.textContent = '🃏';
+                        card.style.background = 'linear-gradient(45deg, #ff0000, #000000)';
+                        card.style.color = '#fff';
+                    } else {
+                        card.textContent = `${pokerHand[index].value}${pokerHand[index].suit}`;
+                        card.style.background = 'rgba(255,255,255,0.9)';
+                        card.style.color = '#000';
+                    }
+                }
+            });
+        }
+
+        function toggleHold(index) {
+            if (!pokerGameActive) return;
+            
+            heldCards[index] = !heldCards[index];
+            const button = document.querySelectorAll('.hold-button')[index];
+            button.classList.toggle('held', heldCards[index]);
+        }
+
+        function resetHoldButtons() {
+            document.querySelectorAll('.hold-button').forEach(button => {
+                button.classList.remove('held');
+            });
+        }
+
+        function drawPoker() {
+            if (!pokerGameActive) return;
+            
+            // Replace non-held cards
+            for (let i = 0; i < 5; i++) {
+                if (!heldCards[i]) {
+                    pokerHand[i] = dealCard();
+                }
+            }
+            
+            displayPokerHand();
+            
+            const bet = parseInt(document.getElementById('pokerBet').value) || 25;
+            const handRank = evaluatePokerHand(pokerHand);
+            
+            document.getElementById('drawBtn').style.display = 'none';
+            pokerGameActive = false;
+            
+            showPokerResult(bet, handRank);
+        }
+
+        function evaluatePokerHand(hand) {
+            // Convert jokers and evaluate best possible hand
+            let bestHand = getBestHandWithJokers(hand);
+            return evaluateSpecificHand(bestHand);
+        }
+
+        function getBestHandWithJokers(hand) {
+            const jokerCount = hand.filter(card => card.value === 'JOKER').length;
+            const regularCards = hand.filter(card => card.value !== 'JOKER');
+            
+            if (jokerCount === 0) {
+                return hand;
+            }
+            
+            // For simplicity with jokers, try different combinations
+            // This is a basic implementation - jokers help make the best possible hand
+            let bestHand = [...hand];
+            
+            // Replace jokers with cards that would make the best hand
+            for (let i = 0; i < bestHand.length; i++) {
+                if (bestHand[i].value === 'JOKER') {
+                    bestHand[i] = { suit: '♠', value: 'A' }; // Default to Ace
+                }
+            }
+            
+            return bestHand;
+        }
+
+        function evaluateSpecificHand(hand) {
+            const values = hand.map(card => card.value);
+            const suits = hand.map(card => card.suit);
+            
+            // Convert face cards to numbers for straight detection
+            const numericalValues = values.map(value => {
+                switch(value) {
+                    case 'A': return 14; // Ace high
+                    case 'K': return 13;
+                    case 'Q': return 12;
+                    case 'J': return 11;
+                    default: return parseInt(value);
+                }
+            }).sort((a, b) => a - b);
+            
+            // Also check for low ace straight (A, 2, 3, 4, 5)
+            const lowAceValues = values.map(value => {
+                switch(value) {
+                    case 'A': return 1; // Ace low
+                    case 'K': return 13;
+                    case 'Q': return 12;
+                    case 'J': return 11;
+                    default: return parseInt(value);
+                }
+            }).sort((a, b) => a - b);
+            
+            // Count occurrences of each value
+            const valueCounts = {};
+            values.forEach(value => valueCounts[value] = (valueCounts[value] || 0) + 1);
+            const counts = Object.values(valueCounts).sort((a, b) => b - a);
+            
+            // Check for flush
+            const isFlush = suits.every(suit => suit === suits[0]);
+            
+            // Check for straight
+            const isStraight = isConsecutive(numericalValues) || isConsecutive(lowAceValues);
+            
+            // Determine hand ranking and payout
+            if (isStraight && isFlush) return { rank: 'Straight Flush', payout: 50 };
+            if (counts[0] === 5) return { rank: 'Five of a Kind', payout: 100 };
+            if (counts[0] === 4) return { rank: 'Four of a Kind', payout: 25 };
+            if (counts[0] === 3 && counts[1] === 2) return { rank: 'Full House', payout: 9 };
+            if (isFlush) return { rank: 'Flush', payout: 6 };
+            if (isStraight) return { rank: 'Straight', payout: 4 };
+            if (counts[0] === 3) return { rank: 'Three of a Kind', payout: 3 };
+            if (counts[0] === 2 && counts[1] === 2) return { rank: 'Two Pair', payout: 2 };
+            if (counts[0] === 2) return { rank: 'Jacks or Better', payout: 1 };
+            
+            return { rank: 'High Card', payout: 0 };
+        }
+
+        function isConsecutive(numbers) {
+            if (numbers.length !== 5) return false;
+            
+            for (let i = 1; i < numbers.length; i++) {
+                if (numbers[i] !== numbers[i-1] + 1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function showPokerResult(bet, handResult) {
+            const resultDiv = document.getElementById('pokerResult');
+            
+            if (handResult.payout > 0) {
+                const winnings = bet * handResult.payout;
+                playerBalance += winnings;
+                gameStats.totalWinnings += winnings;
+                resultDiv.className = 'game-result win';
+                resultDiv.textContent = `🃏 ${handResult.rank}! WON ${winnings} GNC! 🃏`;
+            } else {
+                resultDiv.className = 'game-result lose';
+                resultDiv.textContent = `💸 ${handResult.rank} - Lost ${bet} GNC! 💸`;
+            }
+            
+            resultDiv.style.display = 'block';
+            updateBalance();
+        }
+
+        // Crash Game Functions
+        let crashMultiplier = 1.0;
+        let crashGame = null;
+        let crashBetActive = false;
+
+        function startCrash() {
+            const bet = parseInt(document.getElementById('crashBet').value) || 25;
+            
+            if (bet > playerBalance) {
+                alert('⚠️ INSUFFICIENT FUNDS!');
+                return;
+            }
+            
+            if (crashBetActive) {
+                alert('⚠️ GAME IN PROGRESS!');
+                return;
+            }
+            
+            playerBalance -= bet;
+            gameStats.totalGames++;
+            crashBetActive = true;
+            crashMultiplier = 1.0;
+            
+            document.getElementById('crashStartBtn').style.display = 'none';
+            document.getElementById('cashOutBtn').style.display = 'inline-block';
+            document.getElementById('crashResult').style.display = 'none';
+            
+            // Generate crash point (1.1x to 20x, weighted toward lower values)
+            const crashPoint = Math.pow(Math.random(), 2) * 19 + 1.1;
+            
+            crashGame = setInterval(() => {
+                crashMultiplier += 0.01;
+                document.getElementById('crashMultiplier').textContent = crashMultiplier.toFixed(2) + 'x';
+                
+                if (crashMultiplier >= crashPoint) {
+                    crashGameEnd(false, bet);
+                }
+            }, 50);
+            
+            updateBalance();
+        }
+
+        function cashOut() {
+            if (!crashBetActive) return;
+            
+            const bet = parseInt(document.getElementById('crashBet').value) || 25;
+            crashGameEnd(true, bet);
+        }
+
+        function crashGameEnd(cashedOut, bet) {
+            clearInterval(crashGame);
+            crashBetActive = false;
+            
+            document.getElementById('crashStartBtn').style.display = 'inline-block';
+            document.getElementById('cashOutBtn').style.display = 'none';
+            
+            const resultDiv = document.getElementById('crashResult');
+            
+            if (cashedOut) {
+                const winnings = Math.floor(bet * crashMultiplier);
+                playerBalance += winnings;
+                gameStats.totalWinnings += winnings;
+                resultDiv.className = 'game-result win';
+                resultDiv.textContent = `🚀 CASHED OUT! ${crashMultiplier.toFixed(2)}x = ${winnings} GNC! 🚀`;
+            } else {
+                resultDiv.className = 'game-result lose';
+                resultDiv.textContent = `💥 CRASHED at ${crashMultiplier.toFixed(2)}x! Lost ${bet} GNC! 💥`;
+            }
+            
+            resultDiv.style.display = 'block';
+            
+            // Reset multiplier display
+            setTimeout(() => {
+                document.getElementById('crashMultiplier').textContent = '1.00x';
+            }, 3000);
+            
+            updateBalance();
+        }
+
+        // SIMPLE CHAT SYSTEM - GUARANTEED TO WORK
+        function sendChatMessage() {
+            var input = document.getElementById('chatInput');
+            var message = input.value.trim();
+            
+            if (message === '') return;
+            
+            var chatMessages = document.getElementById('chatMessages');
+            
+            // Add your message
+            var newMessage = document.createElement('div');
+            newMessage.innerHTML = '<span style="color: #00ff00; font-weight: bold;">[YOU]</span> <span style="color: #00ffff;">' + message + '</span>';
+            newMessage.style.marginBottom = '5px';
+            newMessage.style.padding = '3px';
+            newMessage.style.background = 'rgba(0,255,0,0.1)';
+            newMessage.style.borderRadius = '3px';
+            
+            chatMessages.appendChild(newMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            input.value = '';
+            
+            // Bot response (simple)
+            setTimeout(function() {
+                var responses = [
+                    'Nice! 🎰',
+                    'Good luck! 🍀', 
+                    'K-DAWGS KENO is the best! 🐕',
+                    'Love this casino! 💚',
+                    'Just won big! 🎉',
+                    'Crypto to the moon! 🚀'
+                ];
+                var randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                var botNames = ['PLAYER1', 'CRYPTO_KID', 'WINNER', 'GAMER'];
+                var randomName = botNames[Math.floor(Math.random() * botNames.length)];
+                
+                var botMessage = document.createElement('div');
+                botMessage.innerHTML = '<span style="color: #ffff00; font-weight: bold;">[' + randomName + ']</span> <span style="color: #00ffff;">' + randomResponse + '</span>';
+                botMessage.style.marginBottom = '5px';
+                botMessage.style.padding = '3px';
+                
+                chatMessages.appendChild(botMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Keep only last 10 messages
+                while (chatMessages.children.length > 10) {
+                    chatMessages.removeChild(chatMessages.firstChild);
+                }
+            }, 1000 + Math.random() * 2000);
+        }
+        
+        // SIMPLE VOTING SYSTEM - GUARANTEED TO WORK  
+        var playerHasVoted = false;
+        var votes = { baccarat: 3, texas: 7, craps: 2, mines: 12, wheel: 5 };
+        
+        function voteGame(element, gameType) {
+            if (playerHasVoted) {
+                alert('You already voted! One vote per player.');
+                return;
+            }
+            
+            playerHasVoted = true;
+            votes[gameType] = votes[gameType] + 1;
+            
+            // Update the specific element that was clicked
+            var voteText = element.querySelector('div');
+            voteText.textContent = votes[gameType] + ' votes';
+            
+            // Change appearance 
+            element.style.background = '#00ff41';
+            element.style.color = '#000';
+            element.style.fontWeight = 'bold';
+            
+            alert('Vote cast for ' + gameType.toUpperCase() + '! Thanks!');
+            
+            // Add chat message
+            setTimeout(function() {
+                var chatMessages = document.getElementById('chatMessages');
+                var voteMessage = document.createElement('div');
+                voteMessage.innerHTML = '<span style="color: #ffd700; font-weight: bold;">🗳️ You voted for ' + gameType.toUpperCase() + '! 🗳️</span>';
+                voteMessage.style.marginBottom = '5px';
+                voteMessage.style.padding = '3px';
+                voteMessage.style.textAlign = 'center';
+                chatMessages.appendChild(voteMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 500);
+        }
+
+        // Wallet Functions
+        function connectWallet() {
+            alert('🔗 Wallet Connection:\n\nIn a real casino, this would connect to:\n• MetaMask\n• WalletConnect\n• Coinbase Wallet\n• Trust Wallet\n\nFor demo: Wallet already connected! ✅');
+        }
+
+        function depositFunds() {
+            const amount = prompt('💳 Enter GNC amount to deposit:', '100');
+            if (amount && !isNaN(amount) && amount > 0) {
+                const depositAmount = parseInt(amount);
+                playerBalance += depositAmount;
+                updateBalance();
+                updateWalletDisplay();
+                
+                // Add to chat
+                const chatMessages = document.getElementById('chatMessages');
+                const depositMessage = document.createElement('div');
+                depositMessage.style.cssText = 'color: #00ff41; margin-bottom: 5px; padding: 5px; font-weight: bold;';
+                depositMessage.innerHTML = `💳 Deposited ${depositAmount} GNC to your casino balance! 💳`;
+                chatMessages.appendChild(depositMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                alert(`💳 Successfully deposited ${depositAmount} GNC!\nNew Balance: ${playerBalance} GNC`);
+            }
+        }
+
+        function withdrawFunds() {
+            const amount = prompt(`💸 Enter GNC amount to withdraw:\n\nAvailable: ${playerBalance} GNC`, '100');
+            if (amount && !isNaN(amount) && amount > 0) {
+                const withdrawAmount = parseInt(amount);
+                if (withdrawAmount <= playerBalance) {
+                    playerBalance -= withdrawAmount;
+                    updateBalance();
+                    updateWalletDisplay();
+                    
+                    // Add to chat
+                    const chatMessages = document.getElementById('chatMessages');
+                    const withdrawMessage = document.createElement('div');
+                    withdrawMessage.style.cssText = 'color: #ffff00; margin-bottom: 5px; padding: 5px; font-weight: bold;';
+                    withdrawMessage.innerHTML = `💸 Withdrew ${withdrawAmount} GNC to your wallet! 💸`;
+                    chatMessages.appendChild(withdrawMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    alert(`💸 Successfully withdrew ${withdrawAmount} GNC!\nRemaining Balance: ${playerBalance} GNC`);
+                } else {
+                    alert(`❌ Insufficient funds!\nYou only have ${playerBalance} GNC available.`);
+                }
+            }
+        }
+
+        function updateWalletDisplay() {
+            document.getElementById('walletGNC').textContent = playerBalance;
+        }
+
+        function updateLeaderboard() {
+            const leaderboard = document.getElementById('leaderboard');
+            
+            // Regular players with realistic activity
+            const players = [
+                { name: 'CRYPTO_KING', balance: 15750 + Math.floor(Math.random() * 1000) - 500 },
+                { name: 'DIAMOND_HANDS', balance: 12300 + Math.floor(Math.random() * 800) - 400 },
+                { name: 'KENO_MASTER', balance: 9850 + Math.floor(Math.random() * 600) - 300 },
+                { name: 'HIGH_ROLLER', balance: 7200 + Math.floor(Math.random() * 400) - 200 },
+                { name: 'LUCKY_PLAYER', balance: 5500 + Math.floor(Math.random() * 300) - 150 }
+            ];
+            
+            // Add you to list if doing well
+            if (playerBalance > 3000) {
+                players.push({ name: 'YOU', balance: playerBalance });
+            }
+            
+            // Sort by balance
+            players.sort((a, b) => b.balance - a.balance);
+            
+            // Take top 5
+            const topPlayers = players.slice(0, 5);
+            
+            // Update display
+            leaderboard.innerHTML = '';
+            topPlayers.forEach((player, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'leaderboard-entry';
+                
+                const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                const medal = medals[index] || `${index + 1}️⃣`;
+                
+                if (player.name === 'YOU') {
+                    entry.style.background = 'rgba(255,255,0,0.1)';
+                    entry.style.borderColor = '#ffff00';
+                    entry.innerHTML = `<span style="color: #00ff00;">${medal} ${player.name}</span><span style="color: #00ff00;">${player.balance} GNC</span>`;
+                } else {
+                    entry.innerHTML = `<span>${medal} ${player.name}</span><span>${player.balance} GNC</span>`;
+                }
+                
+                leaderboard.appendChild(entry);
+            });
+        }
+
+
+
+        // Utility Functions
+        function updateBalance() {
+            document.getElementById('balanceAmount').textContent = playerBalance;
+            updateWalletDisplay();
+            updateLeaderboard();
+        }
+
+        // Initialize everything - SIMPLE VERSION
+        window.addEventListener('load', function() {
+            initMatrix();
+            initKenoBoard();
+            updateBalance();
+            
+            // CHAT: Add enter key listener
+            var chatInput = document.getElementById('chatInput');
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    sendChatMessage();
+                }
+            });
+            
+            // Welcome message
+            setTimeout(function() {
+                var chatMessages = document.getElementById('chatMessages');
+                var welcome = document.createElement('div');
+                welcome.innerHTML = '<span style="color: #00ff41; font-weight: bold; text-align: center;">🎰 Welcome! Chat and voting now work! 🎰</span>';
+                welcome.style.marginBottom = '5px';
+                welcome.style.padding = '5px';
+                welcome.style.textAlign = 'center';
+                chatMessages.appendChild(welcome);
+            }, 2000);
+            
+            // Test that functions are working
+            console.log('Chat function:', typeof sendChatMessage);
+            console.log('Vote function:', typeof voteGame);
+        });
+    </script>
+</body>
+</html>

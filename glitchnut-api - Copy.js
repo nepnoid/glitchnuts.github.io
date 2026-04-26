@@ -8,8 +8,8 @@ const { Glitchnut, Transaction, Wallet } = require('./glitchnut-core');
 
 class GlitchnutAPI {
   constructor(options = {}) {
-    this.port = options.port || 3000;
-    this.wsPort = options.wsPort || 3001;
+    this.port = options.port || 8000;
+    this.wsPort = options.wsPort || 8080;
     this.blockchain = new Glitchnut(options.blockchain || {});
     
     this.app = express();
