@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const cron = require('node-cron');
 const crypto = require('crypto');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gnc_ec
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(express.static(__dirname));
 
 // MongoDB Connection
 mongoose.connect(MONGODB_URI)
@@ -682,6 +684,10 @@ app.get('/api/admin/stats', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to get stats' });
   }
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start server
