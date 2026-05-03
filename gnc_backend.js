@@ -628,6 +628,78 @@ app.post('/api/keno/win', authenticateToken, async (req, res) => {
   }
 });
 
+// WALLET API ENDPOINTS
+
+app.get('/api/blockchain/stats', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      stats: {
+        difficulty: blockchain.difficulty,
+        miningReward: blockchain.miningReward,
+        blockHeight: blockchain.blockHeight
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get blockchain stats' });
+  }
+});
+
+app.get('/api/wallets/:address/balance', async (req, res) => {
+  try {
+    const user = await User.findOne({ walletAddress: req.params.address });
+    if (!user) return res.status(404).json({ error: 'Wallet not found' });
+    res.json({ success: true, balance: user.gncBalance });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get balance' });
+  }
+});
+
+app.get('/api/wallets/:address/transactions', async (req, res) => {
+  try {
+    const txs = await Transaction.find({
+      $or: [{ fromAddress: req.params.address }, { toAddress: req.params.address }]
+    }).sort({ timestamp: -1 }).limit(50);
+    res.json({ success: true, transactions: txs });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch transactions' });
+  }
+});
+
+app.post('/api/transactions', authenticateToken, async (req, res) => {
+  try {
+    const { toAddress, amount } = req.body;
+    const fromUser = await User.findById(req.user.userId);
+    
+    if (fromUser.gncBalance < amount) {
+      return res.status(400).json({ error: 'Insufficient balance' });
+    }
+
+    fromUser.gncBalance -= amount;
+    await fromUser.save();
+
+    const toUser = await User.findOne({ walletAddress: toAddress });
+    if (toUser) {
+      toUser.gncBalance += amount;
+      await toUser.save();
+    }
+
+    const tx = new Transaction({
+      fromAddress: fromUser.walletAddress,
+      toAddress,
+      amount,
+      type: 'transfer',
+      txHash: blockchain.generateTxHash(),
+      blockHeight: blockchain.blockHeight++
+    });
+    await tx.save();
+
+    res.json({ success: true, txHash: tx.txHash, newBalance: fromUser.gncBalance });
+  } catch (error) {
+    res.status(500).json({ error: 'Transaction failed' });
+  }
+});
+
 // AUTO MINING REWARDS (Background Tasks)
 cron.schedule('*/15 * * * *', async () => {
   try {
