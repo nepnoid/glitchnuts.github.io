@@ -1,0 +1,19 @@
+{
+  "name": "gnc-trio-hub-starter",
+  "version": "1.0.0",
+  "description": "Gemini + Manus + GNC receipt starter kit",
+  "main": "scripts/dry-run.js",
+  "type": "commonjs",
+  "scripts": {
+    "dry-run": "node scripts/dry-run.js",
+    "deploy:receipt": "npx hardhat run scripts/deploy-receipt.js",
+    "compile": "npx hardhat compile"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "ethers": "^6.13.1",
+    "hardhat": "^2.22.10"
+  }
+}
