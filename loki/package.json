@@ -1,0 +1,9 @@
+{
+  "name": "loki-agent",
+  "version": "1.0.0",
+  "main": "loki_cli.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node loki_cli.js"
+  }
+}
