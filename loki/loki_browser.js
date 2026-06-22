@@ -40,7 +40,34 @@ const Loki = (() => {
         ]));
     }
 
-    async function callGemini(text) {
+    // Parse retry-after seconds from Gemini error message
+    function parseRetryDelay(errMsg) {
+        const match = errMsg && errMsg.match(/retry in ([\d.]+)s/i);
+        return match ? Math.ceil(parseFloat(match[1])) : 60;
+    }
+
+    // Show a temporary status message in chat (updates existing or creates new)
+    function showStatus(text) {
+        let el = document.getElementById('loki-status');
+        if (!el) {
+            const chat = document.getElementById('chat');
+            el = document.createElement('div');
+            el.id = 'loki-status';
+            el.className = 'msg loki';
+            el.style.opacity = '0.6';
+            el.style.fontStyle = 'italic';
+            chat.appendChild(el);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        el.innerText = text;
+    }
+
+    function clearStatus() {
+        const el = document.getElementById('loki-status');
+        if (el) el.remove();
+    }
+
+    async function callGemini(text, retryCount = 0) {
         const apiKey = getApiKey();
         if (!apiKey) return { reply: "No API key set. Reload and enter your Gemini key.", reasoning: "no key" };
 
@@ -69,7 +96,24 @@ const Loki = (() => {
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             const msg = err?.error?.message || `API error ${res.status}`;
-            // If key is bad, clear it so user can re-enter
+
+            // Rate limited — auto-retry with countdown
+            if (res.status === 429 && retryCount < 2) {
+                const waitSec = parseRetryDelay(msg);
+                let remaining = waitSec;
+                const timer = setInterval(() => {
+                    remaining--;
+                    showStatus(`Rate limited — retrying in ${remaining}s...`);
+                    if (remaining <= 0) clearInterval(timer);
+                }, 1000);
+                showStatus(`Rate limited — retrying in ${waitSec}s...`);
+                await new Promise(r => setTimeout(r, waitSec * 1000));
+                clearInterval(timer);
+                clearStatus();
+                return callGemini(text, retryCount + 1);
+            }
+
+            // Bad key — clear so user can re-enter
             if (res.status === 400 || res.status === 401 || res.status === 403) {
                 localStorage.removeItem('loki_gemini_key');
             }
