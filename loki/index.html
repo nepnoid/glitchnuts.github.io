@@ -13,14 +13,33 @@
         .reasoning { font-size: 12px; color: #888; margin-top: 4px; font-style: italic; }
         #input-area { padding: 15px; background: #111; display: flex; gap: 10px; border-top: 1px solid #222; }
         input { flex: 1; background: #222; border: 1px solid #333; color: white; padding: 12px; border-radius: 25px; outline: none; font-size: 16px; }
-        button { background: #007aff; border: none; color: white; padding: 0 20px; border-radius: 25px; font-weight: bold; cursor: pointer; }
+        button { background: #007aff; border: none; color: white; padding: 0 20px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 15px; }
+
+        /* API key setup screen */
+        #key-screen { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; gap: 16px; z-index: 10; }
+        #key-screen h2 { margin: 0; font-size: 22px; }
+        #key-screen p { margin: 0; color: #aaa; font-size: 14px; text-align: center; }
+        #key-screen input { width: 100%; box-sizing: border-box; background: #222; border: 1px solid #444; color: white; padding: 14px; border-radius: 12px; font-size: 15px; outline: none; }
+        #key-screen button { width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; }
+        #key-screen a { color: #007aff; font-size: 13px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div id="chat">
+
+    <!-- API key setup -->
+    <div id="key-screen">
+        <h2>Activate Loki</h2>
+        <p>Paste your Gemini API key to get started.<br>Free at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a></p>
+        <input type="password" id="keyInput" placeholder="Paste API key here..." autocomplete="off">
+        <button onclick="saveKey()">Activate</button>
+    </div>
+
+    <!-- Chat UI -->
+    <div id="chat" class="hidden">
         <div class="msg loki">... (waking up)</div>
     </div>
-    <div id="input-area">
+    <div id="input-area" class="hidden">
         <input type="text" id="userInput" placeholder="Talk to Loki..." autocomplete="off">
         <button onclick="send()">Send</button>
     </div>
@@ -29,6 +48,21 @@
     <script>
         const chat = document.getElementById('chat');
         const input = document.getElementById('userInput');
+        const keyScreen = document.getElementById('key-screen');
+
+        function saveKey() {
+            const key = document.getElementById('keyInput').value.trim();
+            if (!key) return;
+            localStorage.setItem('loki_gemini_key', key);
+            showChat();
+        }
+
+        function showChat() {
+            keyScreen.classList.add('hidden');
+            chat.classList.remove('hidden');
+            document.getElementById('input-area').classList.remove('hidden');
+            init();
+        }
 
         async function init() {
             const greeting = await Loki.greet();
@@ -54,13 +88,14 @@
             if (!text) return;
             input.value = '';
             addMsg(text, 'user');
-            
             const result = await Loki.process(text);
             addMsg(result.reply, 'loki', result.reasoning.why);
         }
 
         input.addEventListener('keypress', (e) => { if (e.key === 'Enter') send(); });
-        init();
+
+        // If key already saved, skip setup
+        if (localStorage.getItem('loki_gemini_key')) showChat();
     </script>
 </body>
 </html>
