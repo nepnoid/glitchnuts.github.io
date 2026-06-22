@@ -44,7 +44,7 @@ const Loki = (() => {
         const apiKey = getApiKey();
         if (!apiKey) return { reply: "No API key set. Reload and enter your Gemini key.", reasoning: "no key" };
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         const history = buildHistory();
 
@@ -90,7 +90,7 @@ const Loki = (() => {
             saveMemory({ input: text, reply: result.reply, reasoning: result.reasoning });
             return {
                 reply: result.reply,
-                reasoning: { why: result.reasoning === "gemini" ? "Gemini 1.5 Flash" : result.reasoning }
+                reasoning: { why: result.reasoning === "gemini" ? "Gemini 2.0 Flash" : result.reasoning }
             };
         }
     };
