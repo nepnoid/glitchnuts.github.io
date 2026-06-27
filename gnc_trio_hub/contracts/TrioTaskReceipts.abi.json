@@ -1,0 +1,51 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "receiptId", "type": "uint256"},
+      {"indexed": true, "internalType": "bytes32", "name": "taskHash", "type": "bytes32"},
+      {"indexed": true, "internalType": "bytes32", "name": "offchainPointerHash", "type": "bytes32"},
+      {"indexed": false, "internalType": "address", "name": "submitter", "type": "address"},
+      {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+    ],
+    "name": "ReceiptCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "uint256", "name": "receiptId", "type": "uint256"},
+      {"indexed": true, "internalType": "enum TrioTaskReceipts.Status", "name": "status", "type": "uint8"},
+      {"indexed": true, "internalType": "bytes32", "name": "statusHash", "type": "bytes32"},
+      {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+    ],
+    "name": "ReceiptStatusUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"internalType": "bytes32", "name": "taskHash", "type": "bytes32"},
+      {"internalType": "bytes32", "name": "offchainPointerHash", "type": "bytes32"}
+    ],
+    "name": "createReceipt",
+    "outputs": [{"internalType": "uint256", "name": "receiptId", "type": "uint256"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "uint256", "name": "receiptId", "type": "uint256"},
+      {"internalType": "enum TrioTaskReceipts.Status", "name": "status", "type": "uint8"},
+      {"internalType": "bytes32", "name": "statusHash", "type": "bytes32"}
+    ],
+    "name": "updateStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

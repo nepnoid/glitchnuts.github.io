@@ -1,0 +1,24 @@
+{
+  "name": "gnc-trio-hub",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GNC-backed Kdawg-Gemini-Meli-Manus collaboration hub starter: Gemini structures requests, Meli reviews them, Manus executes approved tasks, and GNC records receipt hashes.",
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:receipt": "hardhat run scripts/deploy-receipt-contract.js --network gnc",
+    "hub:local-only": "node src/trio-hub.js --local-only --dry-run",
+    "hub:dry-run": "node src/trio-hub.js --dry-run",
+    "hub:create": "node src/trio-hub.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "latest",
+    "axios": "latest",
+    "dotenv": "latest",
+    "ethers": "^6.13.5"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "latest",
+    "hardhat": "latest"
+  }
+}
