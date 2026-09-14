@@ -9,13 +9,19 @@
     "deploy:receipt": "hardhat run scripts/deploy-receipt-contract.js --network gnc",
     "hub:local-only": "node src/trio-hub.js --local-only --dry-run",
     "hub:dry-run": "node src/trio-hub.js --dry-run",
-    "hub:create": "node src/trio-hub.js"
+    "hub:create": "node src/trio-hub.js",
+    "start": "node gnc_server.cjs"
   },
   "dependencies": {
     "@google/generative-ai": "latest",
     "axios": "latest",
     "dotenv": "latest",
-    "ethers": "^6.13.5"
+    "ethers": "^6.13.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "latest",
