@@ -1,3 +1,9 @@
+# GNC / GlitchNut Arcade
+
+The public GitHub Pages homepage is a **play-money casino prototype** for pitch and design evaluation. It is a static browser demo with virtual GNC-C credits only. It does not connect to wallets, blockchain RPC, payments, casino operators, or the server-side GNC files in this repository. No deposits, withdrawals, prizes, or real-money play are supported.
+
+The prototype is available at the repository's GitHub Pages URL. The remaining files document the broader GNC collaboration and blockchain work separately.
+
 # GNC Collaboration Hub
 
 This is an executable starter package for using the **GNC blockchain project** as the receipt layer for a Kdawg-Gemini-Meli-Manus collaboration workflow.
