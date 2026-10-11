@@ -4,6 +4,17 @@ The public GitHub Pages homepage is a **play-money casino prototype** for pitch 
 
 The prototype is available at the repository's GitHub Pages URL. The remaining files document the broader GNC collaboration and blockchain work separately.
 
+## Shared casino message board
+
+The GNC server now includes two public board endpoints:
+
+- `GET /api/board/messages?limit=40`
+- `POST /api/board/messages` with `{ "displayName": "Guest", "text": "..." }`
+
+The server stores messages in MongoDB, limits message length, and applies a basic per-IP posting limit. The GitHub Pages client uses the shared API only when the `gnc-board-api` meta tag in `index.html` contains a public **HTTPS** GNC server URL. If that value is blank, it intentionally falls back to browser-local demo posts.
+
+Before enabling shared mode, deploy `gnc_server.cjs` with MongoDB, set a strong `JWT_SECRET`, restrict `CORS_ORIGIN` to the GitHub Pages origin, and set the `gnc-board-api` value to that HTTPS API origin. Do not expose MongoDB credentials, wallet keys, RPC signer keys, or `.env` files in this repository.
+
 # GNC Collaboration Hub
 
 This is an executable starter package for using the **GNC blockchain project** as the receipt layer for a Kdawg-Gemini-Meli-Manus collaboration workflow.
