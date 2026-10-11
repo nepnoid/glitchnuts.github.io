@@ -1,14 +1,30 @@
 services:
   - type: web
     name: gnc-backend
-    env: node
+    runtime: docker
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 5000
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: CORS_ORIGIN
+        value: https://nepnoid.github.io
+      - key: GNC_CHAIN_ID
+        value: 35001
+      - key: GNC_NETWORK_NAME
+        value: gnc-testnet
+      - key: GNC_RPC_HTTP_URL
+        sync: false
+      - key: GNC_EXPLORER_URL
+        sync: false
+      - key: GNC_SETTLEMENT_MODE
+        value: read_only
