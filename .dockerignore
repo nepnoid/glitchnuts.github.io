@@ -8,3 +8,8 @@ mongo-data
 *.key
 *.seed
 wallet-*.json
+**/node_modules
+public-beta/state
+local-testnet/chain-db
+local-testnet/deployment.json
+**/*.sqlite*

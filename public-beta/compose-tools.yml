@@ -1,0 +1,18 @@
+services:
+  tools:
+    profiles: [tools]
+    build:
+      context: ..
+      dockerfile: public-beta/Dockerfile
+    user: "0:0"
+    entrypoint: [node]
+    environment:
+      RPC_UPSTREAM: http://validator1:8545
+      GNC_STATE_DIR: /state
+    volumes:
+      - ./state:/state
+    networks: [chain]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    mem_limit: 512m
+    pids_limit: 128

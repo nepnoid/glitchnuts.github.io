@@ -1,0 +1,25 @@
+{
+  "name": "kdawg-gnc-public-beta",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "deploy:token": "node scripts/deploy-token.mjs",
+    "verify:chain": "node scripts/verify-chain.mjs",
+    "test:chain": "node --test chain/test/chain-kit.test.mjs"
+  },
+  "dependencies": {
+    "ethers": "6.17.0",
+    "express": "4.21.2",
+    "solc": "0.8.24"
+  },
+  "devDependencies": {
+    "ganache": "7.9.2"
+  }
+}
