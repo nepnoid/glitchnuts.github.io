@@ -13,6 +13,33 @@
   </style>
   <!-- Set content to the public HTTPS GNC server URL to enable shared board mode. -->
   <meta name="gnc-board-api" content="">
+
+  <style id="terminal-theme">
+    :root{--bg:#020804;--panel:#06140a;--panel2:#081b0e;--text:#c8ffd8;--muted:#6ba982;--pink:#39ff88;--teal:#8affb1;--amber:#b7ff67;--line:rgba(57,255,136,.25);--shadow:0 0 28px rgba(57,255,136,.08)}
+    *{text-shadow:0 0 8px rgba(57,255,136,.08)}
+    html{background:#020804}
+    body{background:radial-gradient(circle at 50% -20%,rgba(57,255,136,.10),transparent 42%),repeating-linear-gradient(0deg,rgba(57,255,136,.025) 0,rgba(57,255,136,.025) 1px,transparent 1px,transparent 4px),#020804;color:#c8ffd8;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+    body:after{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 0,rgba(57,255,136,.025) 50%,transparent 100%);mix-blend-mode:screen;z-index:30}
+    .top{background:rgba(2,8,4,.94);border-bottom:1px solid rgba(57,255,136,.35);backdrop-filter:none}
+    .brand-mark{border-radius:3px;background:#39ff88;color:#020804;box-shadow:0 0 18px rgba(57,255,136,.45);font-size:18px}
+    .brand-name{color:#39ff88;letter-spacing:.16em}.brand-name:before{content:"> ";color:#8affb1}
+    .pill{border-radius:3px;background:#06140a;color:#8abf99}.pill:hover{border-color:#39ff88;color:#c8ffd8}.safe{border-color:rgba(183,255,103,.5);background:rgba(183,255,103,.08);color:#b7ff67}
+    .eyebrow{color:#39ff88;letter-spacing:.16em}.hero h1{letter-spacing:-.04em}.hero h1 span{color:#39ff88}.hero p,.table-head p,.game-tab p,.keynote p,.board p{color:#78ae89}
+    .bankroll,.table,.side-card,.keynote,.board{border-radius:5px;background:rgba(6,20,10,.92);box-shadow:0 0 24px rgba(57,255,136,.07)}
+    .bankroll-label,.stat-row,.recent,.notice{color:#609b72}.balance{color:#39ff88}.unit{color:#8affb1}.stat-row strong{color:#8affb1}
+    .game-tabs{gap:8px}.game-tab{border-radius:4px;background:#06140a;color:#c8ffd8}.game-tab:hover,.game-tab.active{transform:none;border-color:#39ff88;background:rgba(57,255,136,.1);box-shadow:inset 0 0 18px rgba(57,255,136,.05)}
+    .game-icon{border-radius:3px;background:rgba(57,255,136,.1);color:#39ff88}.game-tab:nth-child(2) .game-icon,.game-tab:nth-child(3) .game-icon{background:rgba(57,255,136,.1);color:#8affb1}
+    .table-head{border-bottom-color:rgba(57,255,136,.2)}.tag{border-radius:3px;background:rgba(57,255,136,.09);color:#8affb1}
+    .stage{border-radius:4px;border-color:rgba(57,255,136,.3);background:radial-gradient(circle at center,rgba(57,255,136,.13),transparent 56%),#020804}.stage:before{border-radius:4px;border-color:rgba(57,255,136,.18);box-shadow:0 0 55px rgba(57,255,136,.1),inset 0 0 35px rgba(57,255,136,.06)}.stage:after{border-color:rgba(57,255,136,.18);border-radius:3px}.symbols{color:#39ff88;text-shadow:0 0 24px rgba(57,255,136,.7)}.result{color:#8abf99}
+    .range strong,.play,.chip.selected,.chip:hover{color:#020804}.range input{accent-color:#39ff88}.chip{border-radius:3px;background:#06140a;color:#9bd3aa}.chip.selected,.chip:hover{border-color:#39ff88;background:#39ff88}.play{border-radius:3px;background:#39ff88}.play:hover{background:#8affb1}
+    .recent{border-top-color:rgba(57,255,136,.2)}.recent span{border-radius:3px;background:rgba(57,255,136,.06)}.recent .win{color:#8affb1;background:rgba(57,255,136,.1)}
+    .leader{border-radius:3px;background:rgba(57,255,136,.04)}.leader.you{background:rgba(57,255,136,.1)}.rank{border-radius:3px;background:rgba(57,255,136,.08);color:#8abf99}.score{color:#8affb1}
+    .notice{border-radius:4px;border-color:rgba(183,255,103,.28);background:rgba(183,255,103,.05)}.notice b{color:#b7ff67}.notice-icon{color:#b7ff67}
+    .feature-grid{gap:8px}.keynote,.board{background:linear-gradient(135deg,rgba(57,255,136,.08),rgba(6,20,10,.95))}.keynote-quote{border-left-color:#39ff88;color:#8affb1}
+    .board-form input{border-radius:3px;background:#020804;color:#c8ffd8;border-color:rgba(57,255,136,.3)}.board-form input:focus{border-color:#39ff88}.board-form button{border-radius:3px;background:#39ff88;color:#020804}.post{border-radius:3px;background:rgba(57,255,136,.05);color:#b7eec4}.post small{color:#609b72}
+    .footer{border-top-color:rgba(57,255,136,.25);color:#609b72}.footer strong{color:#8affb1}.modal-box{border-radius:4px;background:#06140a;border-color:rgba(57,255,136,.3)}.modal-close{color:#78ae89}
+  </style>
+
 </head>
 <body>
   <header class="top"><div class="wrap top-inner"><a class="brand" href="#top"><span class="brand-mark">✦</span><span class="brand-name">GNC / GLITCHNUT</span></a><nav class="nav"><a class="pill" href="#keynote">Keynote</a><a class="pill" href="#board">Board</a><span class="pill safe">🔒 PLAY MONEY ONLY</span><a class="pill" href="https://nepnoid.github.io/glitchnuts.github.io/" aria-label="Home">Home</a></nav></div></header>
