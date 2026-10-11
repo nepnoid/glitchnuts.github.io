@@ -13,6 +13,10 @@ const PORT = runtime.port;
 app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
 app.use(express.json());
 
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'healthy', service: 'gnc-api', settlementMode: runtime.gnc.settlementMode, timestamp: new Date().toISOString() });
+});
+
 // MongoDB connection
 mongoose.connect(runtime.mongoUri)
     .then(() => {

@@ -1,0 +1,39 @@
+services:
+  gnc-api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${GNC_API_PORT:-5000}:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://mongo:27017/gnc_ecosystem
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      CORS_ORIGIN: ${CORS_ORIGIN:?Set CORS_ORIGIN in .env}
+      GNC_CHAIN_ID: ${GNC_CHAIN_ID:-35001}
+      GNC_NETWORK_NAME: ${GNC_NETWORK_NAME:-gnc-testnet}
+      GNC_RPC_HTTP_URL: ${GNC_RPC_HTTP_URL:?Set GNC_RPC_HTTP_URL in .env}
+      GNC_EXPLORER_URL: ${GNC_EXPLORER_URL:-}
+      GNC_SETTLEMENT_MODE: read_only
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mongo-data:
