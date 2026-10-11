@@ -1,19 +1,38 @@
-# GNC / GlitchNut Arcade
+# Kdawg Keno — GNC Gaming Beta
 
-The public GitHub Pages homepage is a **play-money casino prototype** for pitch and design evaluation. It is a static browser demo with virtual GNC-C credits only. It does not connect to wallets, blockchain RPC, payments, casino operators, or the server-side GNC files in this repository. No deposits, withdrawals, prizes, or real-money play are supported.
+**Play now:** https://nepnoid.github.io/glitchnuts.github.io/
 
-The prototype is available at the repository's GitHub Pages URL. The remaining files document the broader GNC collaboration and blockchain work separately.
+Kdawg Keno is a green-terminal browser arcade. Keno is the default game: select **1–5 numbers from 80**, watch **20 distinct numbers** drawn, and receive demo payouts based only on actual matches. There is no unrelated win/loss coin flip. The payout table shows gross returns including the stake. Browser credits have no cash redemption.
 
-## Shared casino message board
+Your bankroll, winning rounds, completed rounds, and personal best persist on this device. Free browser-credit refills are available every 30 seconds. Other lobby games are clearly marked simplified arcade previews. The opt-in SHA-256 puzzle earns 25 browser credits, is stoppable, and is **not network mining**.
 
-The GNC server now includes two public board endpoints:
+## Real local GNC testnet
 
-- `GET /api/board/messages?limit=40`
-- `POST /api/board/messages` with `{ "displayName": "Guest", "text": "..." }`
+The separate [`local-testnet`](local-testnet/README.md) toolkit runs an actual local EVM development chain and deploys `contracts/GNC.sol`. Its GNC token is an **ERC-20 test token**, not the chain's native gas currency. Native test ETH pays gas. This is a single-node development chain, not a decentralized public GNC mainnet. The deployer retains capped minting authority; do not describe the token as ownerless.
 
-The server stores messages in MongoDB, limits message length, and applies a basic per-IP posting limit. The GitHub Pages client uses the shared API only when the `gnc-board-api` meta tag in `index.html` contains a public **HTTPS** GNC server URL. If that value is blank, it intentionally falls back to browser-local demo posts.
+```bash
+npm run testnet:setup
+npm run testnet:start
+```
 
-Before enabling shared mode, deploy `gnc_server.cjs` with MongoDB, set a strong `JWT_SECRET`, restrict `CORS_ORIGIN` to the GitHub Pages origin, and set the `gnc-board-api` value to that HTTPS API origin. Do not expose MongoDB credentials, wallet keys, RPC signer keys, or `.env` files in this repository.
+Use the local faucet page printed by the toolkit. The public GitHub Pages site cannot access another person's localhost. Do not open development RPC/admin methods to the internet. The public beta does not yet use this chain for game settlement.
+
+For checks:
+
+```bash
+npm test
+npm run testnet:verify
+```
+
+## Shared casino message board and RPC badge
+
+The API exposes `GET /api/board/messages?limit=40`, `POST /api/board/messages`, and `GET /api/network/status`. Set the **public HTTPS API origin only** in the `gnc-board-api` meta tag in `index.html`. RPC and message-board statuses are independent: an RPC failure does not mean a healthy board is down. When the API is configured but unavailable, messages are not silently stored locally as if publicly posted.
+
+Messages are rendered as text, not HTML. The API includes MongoDB persistence and a basic in-memory rate limit, but it still needs proper moderation, authentication/abuse protection, retention rules, proxy-aware rate limiting, and operational review before a broad public community launch. CORS alone does not prevent abusive HTTP clients.
+
+No wallet keys, seed phrases, `.env` values, or signer secrets belong in the frontend or repository. Render hosts the API separately; its MongoDB connection must point to a functioning external database. The local node is not deployed to Render by these commands.
+
+---
 
 # GNC Collaboration Hub
 

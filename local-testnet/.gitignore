@@ -1,0 +1,8 @@
+node_modules/
+chain-db/
+*.sqlite
+*.leveldb
+deployment.json
+.env
+.env.*
+coverage/

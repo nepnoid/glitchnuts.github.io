@@ -10,7 +10,12 @@
     "hub:local-only": "node src/trio-hub.js --local-only --dry-run",
     "hub:dry-run": "node src/trio-hub.js --dry-run",
     "hub:create": "node src/trio-hub.js",
-    "start": "node gnc_server.cjs"
+    "start": "node gnc_server.cjs",
+    "test": "node --test scripts/*.test.cjs",
+    "testnet:setup": "npm --prefix local-testnet install --omit=optional",
+    "testnet:start": "npm --prefix local-testnet start",
+    "testnet:mine": "npm --prefix local-testnet run mine --",
+    "testnet:verify": "npm --prefix local-testnet run verify"
   },
   "dependencies": {
     "@google/generative-ai": "latest",
