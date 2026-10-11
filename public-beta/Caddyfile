@@ -1,0 +1,17 @@
+{$BETA_DOMAIN} {
+  encode gzip
+  header {
+    Strict-Transport-Security "max-age=31536000"
+    X-Content-Type-Options nosniff
+    Referrer-Policy no-referrer
+  }
+  reverse_proxy 10.77.0.3:8080 {
+    header_up -X-Forwarded-For
+    header_up X-Forwarded-For {remote_host}
+    header_up -CF-Connecting-IP
+    transport http {
+      dial_timeout 5s
+      response_header_timeout 90s
+    }
+  }
+}

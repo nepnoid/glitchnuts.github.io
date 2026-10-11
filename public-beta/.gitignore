@@ -1,0 +1,9 @@
+node_modules/
+state/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.sqlite*
+*.log
