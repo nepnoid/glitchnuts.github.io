@@ -3,16 +3,18 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const runtime = require('./src/config/runtime.cjs');
+const { getNetworkStatus, getWalletBalance } = require('./src/services/gncServices.cjs');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = runtime.port;
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/gnc_ecosystem')
+mongoose.connect(runtime.mongoUri)
     .then(() => {
         console.log('✅ Connected to MongoDB');
     }).catch(err => {
@@ -317,6 +319,23 @@ app.get('/api/blockchain/stats', async (req, res) => {
         miningDifficulty: blockchain.miningDifficulty,
         currentPrice: (Math.random() * 0.01 + 0.005).toFixed(6) // Simulated price
     });
+});
+
+// Read-only live-chain endpoints. No transaction signing or wallet keys are accepted here.
+app.get('/api/network/status', async (req, res) => {
+    try {
+        res.json(await getNetworkStatus());
+    } catch (error) {
+        res.status(503).json({ status: 'unavailable', source: 'rpc', error: 'GNC RPC unavailable' });
+    }
+});
+
+app.get('/api/wallets/:address/balance', async (req, res) => {
+    try {
+        res.json(await getWalletBalance(req.params.address));
+    } catch (error) {
+        res.status(400).json({ error: 'Unable to read wallet balance' });
+    }
 });
 
 // Start server
