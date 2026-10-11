@@ -76,6 +76,28 @@ const transactionSchema = new mongoose.Schema({
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
 
+
+// Community message board: public reads/posts, bounded content, and a simple in-memory rate limit.
+const messageSchema = new mongoose.Schema({
+    displayName: { type: String, required: true, trim: true, maxlength: 32 },
+    text: { type: String, required: true, trim: true, maxlength: 240 },
+    createdAt: { type: Date, default: Date.now, index: true }
+});
+const Message = mongoose.model('Message', messageSchema);
+const boardRate = new Map();
+const BOARD_WINDOW_MS = 60 * 1000;
+const BOARD_MAX_POSTS = 5;
+
+function boardAllowed(req) {
+    const key = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    const now = Date.now();
+    const recent = (boardRate.get(key) || []).filter(time => now - time < BOARD_WINDOW_MS);
+    if (recent.length >= BOARD_MAX_POSTS) return false;
+    recent.push(now);
+    boardRate.set(key, recent);
+    return true;
+}
+
 // Auth Middleware
 const authMiddleware = async (req, res, next) => {
     try {
@@ -96,6 +118,32 @@ const authMiddleware = async (req, res, next) => {
 };
 
 // Routes
+
+// Shared casino message board
+app.get('/api/board/messages', async (req, res) => {
+    try {
+        const requested = Number.parseInt(req.query.limit, 10) || 40;
+        const limit = Math.min(Math.max(requested, 1), 100);
+        const messages = await Message.find({}, { displayName: 1, text: 1, createdAt: 1, _id: 0 })
+            .sort({ createdAt: -1 }).limit(limit).lean();
+        res.json({ messages });
+    } catch (error) {
+        res.status(503).json({ error: 'Message board unavailable' });
+    }
+});
+
+app.post('/api/board/messages', async (req, res) => {
+    try {
+        if (!boardAllowed(req)) return res.status(429).json({ error: 'Please wait before posting again' });
+        const displayName = String(req.body?.displayName || 'Anonymous').trim().slice(0, 32) || 'Anonymous';
+        const text = String(req.body?.text || '').trim().slice(0, 240);
+        if (!text) return res.status(400).json({ error: 'Message text is required' });
+        const message = await Message.create({ displayName, text });
+        res.status(201).json({ message: { displayName: message.displayName, text: message.text, createdAt: message.createdAt } });
+    } catch (error) {
+        res.status(400).json({ error: 'Could not publish message' });
+    }
+});
 
 // Get User Profile
 app.get('/api/users/profile', authMiddleware, async (req, res) => {
